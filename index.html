@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<title>Pravartanam Use Case Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#f7f8fa;--card:#fff;--border:#e4e7ec;--border-2:#d0d5dd;
+  --text:#101828;--text-2:#475467;--text-3:#667085;--muted:#98a2b3;
+  --primary:#2563eb;--primary-h:#1d4ed8;--primary-soft:#eff6ff;
+  --success:#039855;--info:#0ea5e9;--warn:#dc6803;--danger:#d92d20;--purple:#7c3aed;--gray:#667085;
+  --radius:8px;--shadow:0 1px 2px rgba(16,24,40,.05);
+}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;line-height:1.5}
+button{font-family:inherit}
+.app{min-height:100vh;display:flex;flex-direction:column}
+header{background:#fff;border-bottom:1px solid var(--border);padding:14px 28px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px}
+.brand .brand-logo{height:48px;width:auto;display:block;object-fit:contain}
+.brand h1{margin:0;font-size:16px;font-weight:600}
+.brand .sub{font-size:12px;color:var(--text-3)}
+.hdr-actions{display:flex;gap:8px}
+.hdr-right{display:flex;align-items:center;gap:18px}
+.emblem{text-align:right;line-height:1.25;padding-left:16px;border-left:1px solid var(--border)}
+.emblem-main{font-size:10.5px;color:var(--text-2);font-weight:500;letter-spacing:.2px;white-space:nowrap;line-height:1}
+.emblem-tag{font-family:'Dancing Script','Segoe Script','Brush Script MT',cursive;font-size:24px;font-weight:700;background:linear-gradient(135deg,#2563eb,#7c3aed);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1;margin-top:2px;letter-spacing:.5px}
+.emblem-mark{display:flex;flex-direction:column;align-items:flex-end;margin-left:auto;margin-top:8px}.emblem-symbol{height:23px;width:auto;display:block;object-fit:contain}.emblem-words{line-height:1;text-align:right;margin-top:2px}.emblem-words .ew-1{display:block;font-size:8px;font-weight:800;color:#101828;letter-spacing:.8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}.emblem-words .ew-2{display:block;font-size:6px;font-weight:500;color:#475467;letter-spacing:1px;margin-top:1px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+@media (max-width:820px){.emblem-main{white-space:normal;max-width:170px}}
+@media (max-width:560px){.emblem{display:none}}
+.btn{padding:7px 13px;border:1px solid var(--border-2);border-radius:6px;background:#fff;font-size:13px;font-weight:500;cursor:pointer;color:var(--text);transition:all .12s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:#f9fafb;border-color:#9aa3b0}
+.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn-primary:hover{background:var(--primary-h);border-color:var(--primary-h)}
+.btn-danger{background:#fff;color:var(--danger);border-color:#fda29b}
+.btn-danger:hover{background:#fef3f2}
+.btn-sm{padding:5px 10px;font-size:12px}
+.tabs{background:#fff;border-bottom:1px solid var(--border);padding:0 28px;display:flex;gap:4px}
+.tab{padding:12px 16px;cursor:pointer;font-weight:500;font-size:13px;color:var(--text-3);border-bottom:2px solid transparent;transition:all .12s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+main{flex:1;padding:24px 28px;max-width:1500px;width:100%;margin:0 auto}
+.view{display:none}
+.view.active{display:block}
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:6px;margin-bottom:20px}
+.stat{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow);cursor:pointer;user-select:none;transition:border-color .15s,box-shadow .15s,transform .12s;min-width:0}
+.stat:hover{border-color:var(--border-2);transform:translateY(-1px)}
+.stat:focus{outline:none}
+.stat.selected{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.18)}
+.stat.selected .lbl{color:var(--primary)}
+.stat .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-3);font-weight:600;transition:color .12s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat .val{font-size:22px;font-weight:700;margin-top:3px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat .delta{font-size:11px;color:var(--text-3);margin-top:2px}
+.stat-total .val{color:var(--text)}
+.stat-golive .val{color:var(--success)}
+.stat-started .val{color:var(--gray)}
+.stat-datacoll .val{color:#0891b2}
+.stat-dataana .val{color:var(--info)}
+.stat-modeldev .val{color:#6366f1}
+.stat-clearance .val{color:#ea580c}
+.stat-small{padding:8px 10px;background:#fafbfc;box-shadow:none}
+.stat-small .lbl{font-size:9.5px;letter-spacing:.3px}
+.stat-small .val{font-size:16px;font-weight:600;margin-top:2px}
+/* Filters */
+.filters{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;align-items:end;box-shadow:var(--shadow)}
+.fld label{display:block;font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.fld select,.fld input{width:100%;padding:7px 10px;border:1px solid var(--border-2);border-radius:6px;font-size:13px;background:#fff;color:var(--text);font-family:inherit}
+.fld select:focus,.fld input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+/* Cases list */
+.list-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;color:var(--text-2);font-size:13px}
+.list-head b{color:var(--text)}
+.cases{display:flex;flex-direction:column;gap:10px}
+.case{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:border-color .12s}
+.case:hover{border-color:var(--border-2)}
+.case.expanded{border-color:var(--primary)}
+.case-row{padding:14px 16px;display:grid;grid-template-columns:80px 90px 130px 1fr 130px 30px;gap:14px;align-items:center;cursor:pointer}
+.case-id{font-family:'SF Mono',ui-monospace,Monaco,monospace;font-size:12px;font-weight:600;color:var(--text-2)}
+.case-title{font-weight:500;color:var(--text);line-height:1.4}
+.case-area{font-size:12px;color:var(--text-3);margin-top:2px}
+.case-l2{font-size:12px;color:var(--text-2);margin-top:4px;line-height:1.4;display:flex;align-items:flex-start;gap:6px}
+.l2-tag{display:inline-block;background:#eff6ff;color:var(--primary);font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;letter-spacing:.4px;flex-shrink:0;margin-top:1px}
+.date-pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.date-pill{display:inline-flex;align-items:center;gap:4px;padding:1px 7px;background:#f2f4f7;border-radius:10px;font-size:10px;color:var(--text-2);font-weight:500}
+.date-pill.live{background:#d1fadf;color:#054f31}
+.date-pill.perf{background:#ede4ff;color:#5b21b6}
+.date-pill.perfend{background:#f3e8ff;color:#6b21a8}
+.date-pill.start{background:#e0f2fe;color:#0c4a6e}
+.date-pill.hot{background:#fff1e6;color:#9a3412}
+/* Hot Trials, completed (case has reached Go-Live): switch to green to mirror the Go-Live pill */
+.date-pill.hot.done{background:#d1fadf;color:#054f31;font-weight:600}
+.date-pill.hot.done .lbl{opacity:.85}
+.date-pill.fin{background:#ecfdf5;color:#065f46;font-weight:600}
+.date-pill.fin .lbl{color:#047857;opacity:.85}
+/* Planned (future-dated) pills: hollow with a dashed border to signal "not yet reached" */
+.date-pill.future{background:#fff;outline:1px dashed currentColor;outline-offset:-1px}
+.date-pill.future .lbl{opacity:.75}
+/* Roadmap badge */
+.roadmap-badge{display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+.roadmap-badge.yes{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.roadmap-badge.no{background:#fef3f2;color:#b42318;border:1px solid #fecdca}
+.roadmap-badge::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.85}
+/* Target values panel inside case detail */
+.target-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:6px 0 14px;padding:12px;background:linear-gradient(135deg,#fafbff,#f5f3ff);border-radius:6px;border:1px solid #e0e7ff}
+.target-grid .ti-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-3);font-weight:600}
+.target-grid .ti-val{font-size:14px;color:var(--text);font-weight:600;margin-top:3px}
+.target-grid .ti-val.empty{color:var(--muted);font-weight:400;font-style:italic;font-size:13px}
+.target-grid .ti-val.fin{color:#059669}
+.target-grid .ti-val.roadmap-yes{color:#1d4ed8}
+.target-grid .ti-val.roadmap-no{color:#b42318}
+/* Financial impact KPI in stats */
+.stat-finance .val{color:#059669;font-size:20px}
+.stat-finance .val .unit{font-size:12px;color:var(--text-3);font-weight:500;margin-left:3px;letter-spacing:-.2px}
+.stat-roadmap .val{color:var(--primary)}
+.date-pill .lbl{opacity:.7;font-size:9px;text-transform:uppercase;letter-spacing:.3px}
+.dates-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.dates-grid .field{margin:0}
+.date-display{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:10px 0 14px;padding:10px 12px;background:#f9fafb;border-radius:6px;border:1px solid var(--border)}
+.date-display .di-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-3);font-weight:600}
+.date-display .di-val{font-size:13px;color:var(--text);font-weight:500;margin-top:2px}
+.date-display .di-val.empty{color:var(--muted);font-weight:400;font-style:italic}
+.chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:11px;font-size:11px;font-weight:600;letter-spacing:.2px}
+.chip-bsp{background:#fee4e2;color:#912018}
+.chip-bsl{background:#fef0c7;color:#854a0e}
+.chip-dsp{background:#d1fadf;color:#054f31}
+.chip-rsp{background:#cff9fe;color:#0e7090}
+.chip-isp{background:#fce7f6;color:#9e165f}
+.chip-central{background:#e0e7ff;color:#3730a3}
+.chip-mining{background:#f3e8ff;color:#6b21a8}
+.status{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:11px;font-size:11px;font-weight:600;white-space:nowrap}
+.status::before{content:"";width:6px;height:6px;border-radius:50%}
+.s-not-started{background:#f2f4f7;color:#344054}
+.s-not-started::before{background:#667085}
+.s-data-collection-stage{background:#e0f2fe;color:#0c4a6e}
+.s-data-collection-stage::before{background:#0891b2}
+.s-data-analysis-stage{background:#cff9fe;color:#0c4a6e}
+.s-data-analysis-stage::before{background:var(--info)}
+.s-model-development-stage{background:#e0e7ff;color:#3730a3}
+.s-model-development-stage::before{background:#6366f1}
+.s-model-developed-stage{background:#ffedd5;color:#9a3412}
+.s-model-developed-stage::before{background:#ea580c}
+.s-go-live-stage{background:#d1fadf;color:#054f31}
+.s-go-live-stage::before{background:var(--success)}
+.caret{transition:transform .15s;color:var(--muted)}
+.case.expanded .caret{transform:rotate(90deg)}
+.case-detail{display:none;border-top:1px solid var(--border);padding:18px 20px;background:#fafbfc}
+.case.expanded .case-detail{display:block}
+.detail-grid{display:grid;grid-template-columns:1fr 320px;gap:24px}
+@media (max-width:900px){.detail-grid{grid-template-columns:1fr}.case-row{grid-template-columns:70px 70px 1fr 110px 24px}.case-area{display:none}}
+.section-label{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-3);font-weight:600;margin-bottom:6px}
+.desc{color:var(--text);line-height:1.6;font-size:13px;white-space:pre-wrap}
+.update-panel{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.update-panel h4{margin:0 0 12px;font-size:13px;font-weight:600;color:var(--text)}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-3);font-weight:600;margin-bottom:5px}
+.field label .hint{font-size:9.5px;font-weight:500;color:var(--muted);text-transform:none;letter-spacing:0;margin-left:4px;font-style:italic}
+.status-helper{font-size:11px;color:var(--text-3);margin-top:5px;padding:4px 8px;background:#fffbeb;border:1px dashed #fbbf24;border-radius:4px}
+.status-helper a{color:#b45309;font-weight:600;cursor:pointer;text-decoration:underline}
+.field input,.field select,.field textarea{width:100%;padding:7px 10px;border:1px solid var(--border-2);border-radius:6px;font-size:13px;font-family:inherit;background:#fff;color:var(--text)}
+.field textarea{resize:vertical;min-height:60px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.history{margin-top:14px}
+.history h5{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-3);font-weight:600}
+.hist-list{max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;background:#fff}
+.hist-item{padding:8px 12px;border-bottom:1px solid var(--border);font-size:12px}
+.hist-item:last-child{border:none}
+.hist-time{color:var(--text-3);font-size:11px;margin-bottom:2px}
+.hist-change{color:var(--text)}
+.hist-change b{color:var(--primary)}
+.hist-note{color:var(--text-2);margin-top:3px;font-style:italic}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+/* Reports */
+.report-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;box-shadow:var(--shadow)}
+.report-card h3{margin:0 0 14px;font-size:14px;font-weight:600;color:var(--text)}
+.bar-row{display:grid;grid-template-columns:130px 1fr 50px;gap:12px;align-items:center;margin-bottom:8px;font-size:12px}
+.bar-track{height:10px;background:#f2f4f7;border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;border-radius:5px;transition:width .3s}
+.bar-count{color:var(--text-2);font-weight:600;text-align:right}
+.report-actions{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:end}
+.activity-table{width:100%;border-collapse:collapse;font-size:13px}
+.activity-table th{text-align:left;padding:8px 10px;background:#f9fafb;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-3);font-weight:600;border-bottom:1px solid var(--border)}
+.activity-table td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+.activity-table tr:last-child td{border:none}
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:10px 16px;border-radius:6px;font-size:13px;box-shadow:0 8px 16px rgba(0,0,0,.15);opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:100}
+.toast.show{opacity:1;transform:translateY(0)}
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(16,24,40,.5);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:10px;max-width:480px;width:100%;box-shadow:0 20px 25px rgba(0,0,0,.15)}
+.modal-head{padding:16px 20px;border-bottom:1px solid var(--border)}
+.modal-head h2{margin:0;font-size:15px;font-weight:600}
+.modal-body{padding:18px 20px}
+.modal-foot{padding:14px 20px;border-top:1px solid var(--border);background:#fafbfc;display:flex;justify-content:flex-end;gap:8px;border-radius:0 0 10px 10px}
+.search-wrap{position:relative}
+.search-wrap input{padding-left:30px}
+.search-wrap::before{content:"🔍";position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:12px;opacity:.5}
+.notice{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;padding:10px 14px;border-radius:6px;font-size:12px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.notice b{font-weight:600}
+@media print{header,.tabs,.filters,.btn,.update-panel{display:none!important}.case-detail{display:block!important}}
+/* View-only mode: hide all editing UI */
+body.view-only .hdr-actions{display:none}
+body.view-only .emblem{padding-left:0;border-left:none}
+body.view-only .update-panel{display:none}
+body.view-only .detail-grid{grid-template-columns:1fr 320px}
+body.view-only .case-detail .detail-grid > div:last-child > .history{margin-top:0}
+.view-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:#eef4ff;color:#1e40af;border-radius:11px;font-size:11px;font-weight:600;letter-spacing:.3px;margin-left:10px}
+.view-pill::before{content:"";width:6px;height:6px;border-radius:50%;background:#1e40af}
+body:not(.view-only) .view-pill{display:none}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand">
+    <img class="brand-logo" src="data:image/png;base64,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" alt="SAIL">
+    <div>
+      <h1>Pravartanam Use Case Tracker<span class="view-pill">View Only</span></h1>
+      <div class="sub">SAIL Plants — BSP · BSL · DSP · RSP · ISP</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-actions">
+      <button class="btn btn-primary" onclick="publishHtml()" title="Download a new HTML file with all your current updates baked in. Re-upload this to Tiiny.host so everyone sees the latest state.">📤 Publish HTML</button>
+      <button class="btn" onclick="exportData()">⬇ Backup</button>
+      <button class="btn" onclick="document.getElementById('importFile').click()">⬆ Restore</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+      <button class="btn btn-danger btn-sm" onclick="resetData()">Reset</button>
+    </div>
+    <div class="emblem" aria-label="Developed by SAIL Digital Transformation Division">
+      <div class="emblem-main">Developed by SAIL Digital Transformation Division</div>
+      <div class="emblem-mark">
+        <img class="emblem-symbol" src="data:image/png;base64,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" alt="">
+        <div class="emblem-words"><span class="ew-1">ENDLESS</span><span class="ew-2">POSSIBILITIES</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="tabs">
+  <div class="tab active" data-view="cases" onclick="setView('cases')">Use Cases</div>
+  <div class="tab" data-view="reports" onclick="setView('reports')">Reports</div>
+</div>
+<main>
+<!-- CASES VIEW -->
+<div class="view active" id="view-cases">
+  <div class="stats" id="stats"><div class="stat stat-total" role="button" tabindex="0" title="Show all use cases" onclick="selectStatBadge('')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectStatBadge(\'\')}">
+      <div class="lbl">Total</div><div class="val">47</div>
+    </div><div class="stat stat-roadmap selected" role="button" tabindex="0" title="Total value committed in target value list: ₹1143 Cr/yr across 40 cases. Click to filter." onclick="selectRoadmapBadge('Yes')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectRoadmapBadge(\'Yes\')}">
+      <div class="lbl">In Target Value List</div><div class="val">40</div>
+    </div><div class="stat stat-finance" role="" tabindex="-1" title="Realized impact from Go-Live cases (₹70 Cr) out of total target ₹1403 Cr/yr" style="cursor:default">
+      <div class="lbl">Realized Impact</div><div class="val">₹70<span class="unit"> / ₹1403 Cr/yr</span></div>
+    </div><div class="stat stat-started" role="button" tabindex="0" title="Counter: cases whose status has moved away from " not="" started"="" via="" the="" dropdown.="" click="" to="" filter."="" onclick="selectStatBadge('__started__')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectStatBadge(\'__started__\')}">
+      <div class="lbl">Started</div><div class="val">20</div>
+    </div><div class="stat stat-golive" role="button" tabindex="0" title="Filter by Go-Live Stage (click again to clear)" onclick="selectStatBadge('Go-Live Stage')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectStatBadge(\'Go-Live Stage\')}">
+      <div class="lbl">Go-Live Stage</div><div class="val">3</div>
+    </div><div class="stat stat-datacoll stat-small" role="button" tabindex="0" title="Filter by Data Collection Stage (click again to clear)" onclick="selectStatBadge('Data Collection Stage')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectStatBadge(\'Data Collection Stage\')}">
+      <div class="lbl">Data Collection Stage</div><div class="val">7</div>
+    </div><div class="stat stat-dataana stat-small" role="button" tabindex="0" title="Filter by Data Analysis Stage (click again to clear)" onclick="selectStatBadge('Data Analysis Stage')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectStatBadge(\'Data Analysis Stage\')}">
+      <div class="lbl">Data Analysis Stage</div><div class="val">2</div>
+    </div><div class="stat stat-modeldev stat-small" role="button" tabindex="0" title="Filter by Model Dev Stage (click again to clear)" onclick="selectStatBadge('Model Development Stage')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectStatBadge(\'Model Development Stage\')}">
+      <div class="lbl">Model Dev Stage</div><div class="val">6</div>
+    </div><div class="stat stat-clearance stat-small selected" role="button" tabindex="0" title="Filter by Model Developed Stage (click again to clear)" onclick="selectStatBadge('Model Developed Stage')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectStatBadge(\'Model Developed Stage\')}">
+      <div class="lbl">Model Developed Stage</div><div class="val">2</div>
+    </div></div>
+  <div class="filters">
+    <div class="fld search-wrap">
+      <label>Search</label>
+      <input type="text" id="f-search" placeholder="Initiative or area…" oninput="render()">
+    </div>
+    <div class="fld">
+      <label>Plant &amp; Central</label>
+      <select id="f-plant" onchange="render()"><option value="">All Plants &amp; Central</option><option value="BSL">BSL</option><option value="BSP">BSP</option><option value="Central">Central</option><option value="DSP">DSP</option><option value="ISP">ISP</option><option value="Mining">Mining</option><option value="RSP">RSP</option></select>
+    </div>
+    <div class="fld">
+      <label>Area</label>
+      <select id="f-area" onchange="render()"><option value="">All Areas</option><option value="Blast Furnace">Blast Furnace</option><option value="Coke Oven">Coke Oven</option><option value="HSM (Hot Strip Mill)">HSM (Hot Strip Mill)</option><option value="Logistics">Logistics</option><option value="MSM (Medium Structural Mill)">MSM (Medium Structural Mill)</option><option value="Marketing &amp; Sales">Marketing &amp; Sales</option><option value="Mines">Mines</option><option value="Plate Mill">Plate Mill</option><option value="SMS">SMS</option><option value="Safety">Safety</option><option value="Sinter Plant">Sinter Plant</option><option value="Sinter Plant (SP-3)">Sinter Plant (SP-3)</option><option value="Traffic">Traffic</option><option value="URM (Universal Rail Mill)">URM (Universal Rail Mill)</option><option value="USM (Universal Structural Mill)">USM (Universal Structural Mill)</option></select>
+    </div>
+    <div class="fld">
+      <label>Status</label>
+      <select id="f-status" onchange="render()">
+        <option value="">All Status</option>
+        <option value="__started__">Started (any phase)</option>
+        <option>Not Started</option>
+        <option>Data Collection Stage</option>
+        <option>Data Analysis Stage</option>
+        <option>Model Development Stage</option>
+        <option>Model Developed Stage</option>
+        <option>Go-Live Stage</option>
+      </select>
+    </div>
+    <div class="fld">
+      <label>Target Value List</label>
+      <select id="f-roadmap" onchange="render()">
+        <option value="">All</option>
+        <option value="Yes">In Target Value List</option>
+        <option value="No">Not in Target Value List</option>
+      </select>
+    </div>
+    <div class="fld">
+      <label>Sort</label>
+      <select id="f-sort" onchange="render()">
+        <option value="id">By ID</option>
+        <option value="plant">By Plant</option>
+        <option value="status">By Status</option>
+        <option value="updated">Recently Updated</option>
+        <option value="financialImpact">By Financial Impact</option>
+      </select>
+    </div>
+  </div>
+  <div class="list-head">
+    Showing <b id="count-shown">2</b> of <b id="count-total">47</b> use cases
+  </div>
+  <div class="cases" id="cases-list">
+  <div class="case" id="case-UC012">
+    <div class="case-row" onclick="toggleCase('UC012')">
+      <div class="case-id">UC012</div>
+      <div><span class="chip chip-bsp">BSP</span></div>
+      <div class="case-area">SMS</div>
+      <div>
+        <div class="case-title">Ferro Alloy Cost Optimization through Recovery Prediction</div>
+        
+        
+        <div class="date-pills"><span class="roadmap-badge yes" title="Part of plant target value list">In Target Value List</span><span class="date-pill fin"><span class="lbl">Impact</span> ₹13 Cr</span><span class="date-pill hot"><span class="lbl">Hot Trials</span> Apr 2026</span><span class="date-pill perf"><span class="lbl">Perf Start</span> May 2026</span><span class="date-pill perfend future"><span class="lbl">Perf End</span> Jul 2026</span></div>
+      </div>
+      <div><span class="status s-model-developed-stage">Model Developed Stage</span></div>
+      <div class="caret">▶</div>
+    </div>
+    <div class="case-detail">
+      <div class="detail-grid">
+        <div>
+          <div class="section-label">Plant</div>
+          <div style="margin-bottom:14px">Bhilai Steel Plant <span style="color:var(--text-3)">(BSP)</span></div>
+          <div class="section-label">Target Values <span style="font-weight:400;color:var(--text-3);text-transform:none;letter-spacing:0;font-size:11px">(from Consolidated Tracker)</span></div>
+          <div class="target-grid">
+            <div>
+              <div class="ti-lbl">Target Value List</div>
+              <div class="ti-val roadmap-yes">Yes</div>
+            </div>
+            <div>
+              <div class="ti-lbl">Financial Impact</div>
+              <div class="ti-val fin">₹13 Cr/yr</div>
+            </div>
+          </div>
+          <div class="section-label">Key Dates</div>
+          <div class="date-display">
+            <div><div class="di-lbl">Hot Trials</div><div class="di-val ">Apr 2026</div></div>
+            <div><div class="di-lbl">Go-Live</div><div class="di-val empty">—</div></div>
+            <div><div class="di-lbl">Performance Start</div><div class="di-val ">May 2026</div></div>
+            <div><div class="di-lbl">Performance End</div><div class="di-val ">Jul 2026</div></div>
+          </div>
+          
+          <div class="section-label">Use Case Description</div>
+          <div class="desc">Current ferro alloy consumption is ~18.3 kg/t-CS with considerable variation within the same grade. Develops a predictive model using ML to predict alloy recovery rates, identify high-impact parameters, and recommend optimal dosing integrated into a real-time advisory system. Target: ~0.9 kg/tCS reduction for grades contributing to 85% of consumption across both SMS. Financial impact: INR 35–45 Cr. per annum. Feasibility: 8/10.</div>
+        </div>
+        <div>
+          <div class="update-panel">
+            <h4>Update Status</h4>
+            <div class="field">
+              <label>Status</label>
+              <select id="upd-status-UC012">
+                <option>Not Started</option><option>Data Collection Stage</option><option>Data Analysis Stage</option><option>Model Development Stage</option><option selected="">Model Developed Stage</option><option>Go-Live Stage</option>
+              </select>
+              
+            </div>
+            <div class="field">
+              <label>Owner / Lead</label>
+              <input type="text" id="upd-owner-UC012" value="" placeholder="Person responsible">
+            </div>
+            <div class="dates-grid">
+              <div class="field">
+                <label>Target Value List</label>
+                <select id="upd-roadmap-UC012">
+                  <option value="">—</option>
+                  <option value="Yes" selected="">Yes (In Target Value List)</option>
+                  <option value="No">No (Not in Target Value List)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Financial Impact (₹ Cr/yr)</label>
+                <input type="number" step="any" id="upd-finimpact-UC012" value="13" placeholder="e.g. 50">
+              </div>
+              <div class="field">
+                <label>Hot Trials</label>
+                <input type="month" id="upd-hot-UC012" value="2026-04">
+              </div>
+              <div class="field">
+                <label>Go-Live</label>
+                <input type="month" id="upd-golive-UC012" value="">
+              </div>
+              <div class="field">
+                <label>Performance Start</label>
+                <input type="month" id="upd-perf-UC012" value="2026-05">
+              </div>
+              <div class="field">
+                <label>Performance End</label>
+                <input type="month" id="upd-perfend-UC012" value="2026-07">
+              </div>
+            </div>
+            <div class="field">
+              <label>Update Note</label>
+              <textarea id="upd-note-UC012" placeholder="What happened in this update?"></textarea>
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="saveUpdate('UC012')">Save Update</button>
+          </div>
+          <div class="history">
+            <h5>Update History (1)</h5>
+            <div class="hist-list">
+              <div class="hist-item">
+    <div class="hist-time">02 May 2026, 16:46</div>
+    <div class="hist-change">Status: <b>Not Started</b> → <b>Model Developed Stage</b></div>
+    <div class="hist-note">Started: May 2026</div>
+    
+  </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="case" id="case-UC043">
+    <div class="case-row" onclick="toggleCase('UC043')">
+      <div class="case-id">UC043</div>
+      <div><span class="chip chip-central">Central</span></div>
+      <div class="case-area">Logistics</div>
+      <div>
+        <div class="case-title">Coal Differential Freight Model</div>
+        <div class="case-l2"><span class="l2-tag">L2</span> Coal differential freight model</div>
+        
+        <div class="date-pills"><span class="roadmap-badge yes" title="Part of plant target value list">In Target Value List</span><span class="date-pill fin"><span class="lbl">Impact</span> ₹40 Cr</span><span class="date-pill hot"><span class="lbl">Hot Trials</span> Apr 2026</span><span class="date-pill perf"><span class="lbl">Perf Start</span> May 2026</span><span class="date-pill perfend future"><span class="lbl">Perf End</span> Jul 2026</span></div>
+      </div>
+      <div><span class="status s-model-developed-stage">Model Developed Stage</span></div>
+      <div class="caret">▶</div>
+    </div>
+    <div class="case-detail">
+      <div class="detail-grid">
+        <div>
+          <div class="section-label">Plant</div>
+          <div style="margin-bottom:14px">Central Function <span style="color:var(--text-3)">(Central)</span></div>
+          <div class="section-label">Target Values <span style="font-weight:400;color:var(--text-3);text-transform:none;letter-spacing:0;font-size:11px">(from Consolidated Tracker)</span></div>
+          <div class="target-grid">
+            <div>
+              <div class="ti-lbl">Target Value List</div>
+              <div class="ti-val roadmap-yes">Yes</div>
+            </div>
+            <div>
+              <div class="ti-lbl">Financial Impact</div>
+              <div class="ti-val fin">₹40 Cr/yr</div>
+            </div>
+          </div>
+          <div class="section-label">Key Dates</div>
+          <div class="date-display">
+            <div><div class="di-lbl">Hot Trials</div><div class="di-val ">Apr 2026</div></div>
+            <div><div class="di-lbl">Go-Live</div><div class="di-val empty">—</div></div>
+            <div><div class="di-lbl">Performance Start</div><div class="di-val ">May 2026</div></div>
+            <div><div class="di-lbl">Performance End</div><div class="di-val ">Jul 2026</div></div>
+          </div>
+          <div class="section-label">L2 Initiative</div><div style="margin-bottom:14px;color:var(--text)">Coal differential freight model</div>
+          <div class="section-label">Use Case Description</div>
+          <div class="desc">Differential freight model for coal logistics to optimise routing and contract selection across coal sources. Targeted deployment: April 2026. Financial impact: INR 40 Cr per annum.</div>
+        </div>
+        <div>
+          <div class="update-panel">
+            <h4>Update Status</h4>
+            <div class="field">
+              <label>Status</label>
+              <select id="upd-status-UC043">
+                <option>Not Started</option><option>Data Collection Stage</option><option>Data Analysis Stage</option><option>Model Development Stage</option><option selected="">Model Developed Stage</option><option>Go-Live Stage</option>
+              </select>
+              
+            </div>
+            <div class="field">
+              <label>Owner / Lead</label>
+              <input type="text" id="upd-owner-UC043" value="" placeholder="Person responsible">
+            </div>
+            <div class="dates-grid">
+              <div class="field">
+                <label>Target Value List</label>
+                <select id="upd-roadmap-UC043">
+                  <option value="">—</option>
+                  <option value="Yes" selected="">Yes (In Target Value List)</option>
+                  <option value="No">No (Not in Target Value List)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Financial Impact (₹ Cr/yr)</label>
+                <input type="number" step="any" id="upd-finimpact-UC043" value="40" placeholder="e.g. 50">
+              </div>
+              <div class="field">
+                <label>Hot Trials</label>
+                <input type="month" id="upd-hot-UC043" value="2026-04">
+              </div>
+              <div class="field">
+                <label>Go-Live</label>
+                <input type="month" id="upd-golive-UC043" value="">
+              </div>
+              <div class="field">
+                <label>Performance Start</label>
+                <input type="month" id="upd-perf-UC043" value="2026-05">
+              </div>
+              <div class="field">
+                <label>Performance End</label>
+                <input type="month" id="upd-perfend-UC043" value="2026-07">
+              </div>
+            </div>
+            <div class="field">
+              <label>Update Note</label>
+              <textarea id="upd-note-UC043" placeholder="What happened in this update?"></textarea>
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="saveUpdate('UC043')">Save Update</button>
+          </div>
+          <div class="history">
+            <h5>Update History (1)</h5>
+            <div class="hist-list">
+              <div class="hist-item">
+    <div class="hist-time">04 May 2026, 17:16</div>
+    <div class="hist-change">Status: <b>Not Started</b> → <b>Model Developed Stage</b></div>
+    <div class="hist-note">Started: May 2026</div>
+    
+  </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</div>
+<!-- REPORTS VIEW -->
+<div class="view" id="view-reports">
+  <div class="report-card">
+    <h3>Status Distribution</h3>
+    <div id="status-dist"></div>
+  </div>
+  <div class="report-card">
+    <h3>By Plant</h3>
+    <div id="plant-dist"></div>
+  </div>
+  <div class="report-card">
+    <h3>Realized Financial Impact by Plant <span style="font-weight:400;color:var(--text-3);font-size:12px">(Go-Live cases vs. target, ₹ Cr/yr)</span></h3>
+    <div id="finance-dist"></div>
+  </div>
+  <div class="report-card">
+    <h3>Activity Log</h3>
+    <div class="report-actions">
+      <div class="fld" style="min-width:160px"><label>From Date</label><input type="date" id="r-from"></div>
+      <div class="fld" style="min-width:160px"><label>To Date</label><input type="date" id="r-to"></div>
+      <button class="btn btn-primary" onclick="renderActivity()">Apply</button>
+      <button class="btn" onclick="setQuickRange(7)">Last 7 days</button>
+      <button class="btn" onclick="setQuickRange(30)">Last 30 days</button>
+      <button class="btn" onclick="exportActivityCSV()">⬇ Export CSV</button>
+      <button class="btn" onclick="window.print()">🖨 Print</button>
+    </div>
+    <div id="activity-summary" style="font-size:13px;color:var(--text-2);margin-bottom:10px"></div>
+    <div id="activity-log"></div>
+  </div>
+  <div class="report-card">
+    <h3>Full Snapshot</h3>
+    <div class="report-actions">
+      <button class="btn" onclick="exportSnapshotCSV()">⬇ Export Full Snapshot (CSV)</button>
+    </div>
+    <div style="font-size:12px;color:var(--text-3)">All use cases with current status, owner, target date and last update — useful for weekly status meetings.</div>
+  </div>
+</div>
+</main>
+</div>
+<div class="toast" id="toast">Update saved</div>
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-head"><h2 id="modal-title">Confirm</h2></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="modal-ok">Confirm</button>
+    </div>
+  </div>
+</div>
+<script>
+const SEED = [{"id":"UC001","plant":"BSL","area":"Coke Oven","initiative":"Coke Quality (CSR, CRI, M40, M10) Optimization Using Blend Properties and Source-wise Tracking to Control Variability","description":"Current CSR and CRI parameters show a declining trend due to higher reliance on indigenous coal with variable quality, impacting blast furnace performance and fuel rate efficiency. This initiative predicts CSR, CRI, M10, M40 using advanced analytics based on coal blend properties, identifies key input properties influencing variability, enables source-wise coal tracking and blend optimization, deploys a CSR prediction dashboard, recommends battery operating ranges, and monitors blend consistency. Financial impact: included in BF fuel rate impact. Carbon impact: 30–40 ktCO₂/yr. Feasibility: 3.5/10.","l2Initiative":"","inRoadmap":"Yes","financialImpact":0,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"2026-03-01","perfStartDate":"2026-04-01","perfEndDate":"2026-06-01"},{"id":"UC002","plant":"BSL","area":"Blast Furnace","initiative":"Blast Furnace Fuel Rate Reduction at BF-2","description":"The current blast furnace fuel rate stands at ~548 kg/tHM, significantly inflating hot metal production cost. This initiative develops a data-driven model linking fuel rate with key operational parameters. Sub-models include silicon prediction and control, heat loss minimization, hot blast parameter optimization, burden charging optimization, oxygen enrichment optimization, and top gas utilization. Target is ~27 kg/tHM fuel rate reduction and ~0.06 Mtpa throughput improvement. Financial impact: INR 80–120 Cr. per annum. Carbon impact: 110–130 ktCO₂/yr. Feasibility: 8/10.","l2Initiative":"Slag Rate Reduction in BF-2","inRoadmap":"Yes","financialImpact":25,"status":"Model Development Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-02T11:11:42.916Z","from":"Not Started","to":"Model Development Stage","note":"","startedChange":"2026-05-02"}],"startedDate":"2026-05-02","goLiveDate":"","hotTrials":"2026-05-01","perfStartDate":"2026-10-01","perfEndDate":"2026-12-01"},{"id":"UC003","plant":"BSL","area":"Blast Furnace","initiative":"Blast Furnace Productivity Improvement at BF-2","description":"Current blast furnace productivity stands at ~1.9 t/m³/day, with potential for improvement. This initiative develops data-driven models including permeability index optimization, charging recommender and descent rate optimization, hearth drainage and tap-to-tap time minimization, coke quality prediction and optimization, and hot blast parameter optimization. Target is ~0.12 Mtpa throughput improvement. Financial impact: INR 70–90 Cr. per annum. Feasibility: 7.5/10.","l2Initiative":"Hot Blast temperature Optimization","inRoadmap":"Yes","financialImpact":0,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC004","plant":"BSL","area":"SMS","initiative":"Ferro Alloy Consumption Reduction through Recovery Prediction","description":"Current ferro alloy consumption in SMS-II is ~9.3 kg/t-CS with considerable variation within the same grade. This initiative develops a predictive model to optimize ferroalloy usage by maximizing recovery, including ML model for alloy recovery rates, identification of high-impact parameters, and optimal dosing recommendations integrated into a real-time advisory system. Target is ~0.5 kg/tCS reduction. Financial impact: INR 8–10 Cr. per annum. Carbon impact: 3–4 ktCO₂/yr. Feasibility: 9/10.","l2Initiative":"","inRoadmap":"Yes","financialImpact":12,"status":"Go-Live Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-02T11:12:48.939Z","from":"Not Started","to":"Go-Live Stage","note":"","goLiveChange":"2026-03-01","perfChange":"2026-03-01","perfEndChange":"2026-06-01","hotChange":"2026-03-01","startedChange":"2026-05-02"}],"startedDate":"2026-05-02","goLiveDate":"2026-03-01","hotTrials":"2026-03-01","perfStartDate":"2026-03-01","perfEndDate":"2026-06-01"},{"id":"UC005","plant":"BSL","area":"HSM (Hot Strip Mill)","initiative":"Increase HSM Throughput through Reduction of Mill and Furnace Downtime","description":"Current HSM production is ~3.7 Mtpa, significantly below installed capacity of ~4.5 Mtpa. Key limiting factors include frequent cobbles, drive breakdowns, and furnace downtime from scale formation. This initiative deploys real-time monitoring and predictive analytics for cobble prevention, condition-based monitoring of mill drives, scale formation trend analysis, and automated/remote scale removal machines. Target is ~0.2 Mtpa production increase. Financial impact: INR 120–150 Cr. per annum. Feasibility: 8.5/10.","l2Initiative":"Furnace Slab Soaking time Optimization","inRoadmap":"Yes","financialImpact":80,"status":"Data Collection Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-02T11:13:13.278Z","from":"Not Started","to":"Data Collection Stage","note":"","startedChange":"2026-05-02"}],"startedDate":"2026-05-02","goLiveDate":"","hotTrials":"2026-06-01","perfStartDate":"2026-07-01","perfEndDate":"2026-09-01"},{"id":"UC006","plant":"BSL","area":"Safety","initiative":"App-based Real-time Alerts for Unsafe Acts, Safety Violations, Equipment Issues, and Permit Violations with SOS Alerts and Live Recording","description":"Addresses the complexity of ensuring consistent PPE usage and safety compliance. Includes AI-powered PPE detection via video analytics, automatic identification of unsafe acts and hazards, mobile app alerts, SOS alerts with geo-tagging, live video/audio recording, and centralized safety dashboard. Non-financial impact: incident response efficiency, PPE compliance rate, near miss capture and reduction. Feasibility: 7/10.","l2Initiative":"","inRoadmap":"Yes","financialImpact":0,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC007","plant":"BSL","area":"Safety","initiative":"AI-enabled Geo-tagged Mobile App for Real-time Capture of Safety Observations","description":"Field-level safety observations are often captured manually, leading to delays and incomplete records. This initiative provides real-time capture with geo-location tagging, AI-assisted classification, automatic aggregation and visualization on dashboards, early alerts for critical violations, historical analysis and benchmarking, and SOP enforcement support. Feasibility: 8.5/10.","l2Initiative":"","inRoadmap":"Yes","financialImpact":0,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC008","plant":"BSP","area":"Sinter Plant (SP-3)","initiative":"Fuel Rate Reduction through BTP Stabilization, Permeability Improvement and FeO Control","description":"Current sinter plant fuel rate is ~68 kg/tgs, leading to higher energy cost and emissions. Develops a multi-layered digital solution including live BTP prediction model, FeO classification model to predict good and bad zones, and SOPs to improve bed permeability. Target: ~2 kg/tgs reduction. Financial impact: INR 10–20 Cr. per annum. Carbon impact: 35–40 ktCO₂/yr. Feasibility: 7.5/10.","l2Initiative":"","inRoadmap":"Yes","financialImpact":15,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC009","plant":"BSP","area":"Blast Furnace","initiative":"Blast Furnace Fuel Rate Reduction at BF-8","description":"Current blast furnace fuel rate stands at ~550 kg/tHM. Develops data-driven models including silicon prediction and control, heat loss minimization, hot blast parameter optimization, burden charging optimization, oxygen enrichment optimization, and top gas utilization. Target: ~6 kg/tHM reduction and ~0.03 Mtpa throughput improvement. Financial impact: INR 35–50 Cr. per annum. Carbon impact: 50–55 ktCO₂/yr. Feasibility: 9/10.","l2Initiative":"","inRoadmap":"Yes","financialImpact":100,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"2026-12-01","perfStartDate":"","perfEndDate":""},{"id":"UC010","plant":"BSP","area":"Blast Furnace","initiative":"Blast Furnace Slag Rate Reduction at BF-8","description":"Current blast furnace slag rate is ~560 kg/tHM, driving up hot metal production costs. High slag rate driven by high Silica and Alumina content in raw material and flux additions at the sinter plant. Develops models including sinter chemistry optimization, incoming material quality prediction, slag basicity and viscosity analysis, coke quality prediction, and burden distribution optimization. Target: ~2.6 kg/tHM fuel rate reduction from slag reduction and ~0.02 Mtpa throughput improvement. Financial impact: INR 20–30 Cr. per annum. Feasibility: 10/10.","l2Initiative":"","inRoadmap":"Yes","financialImpact":50,"status":"Data Collection Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-02T11:16:20.505Z","from":"Not Started","to":"Data Collection Stage","note":"","startedChange":"2026-05-02"}],"startedDate":"2026-05-02","goLiveDate":"","hotTrials":"2026-10-01","perfStartDate":"2026-11-01","perfEndDate":"2027-01-01"},{"id":"UC011","plant":"BSP","area":"Blast Furnace","initiative":"Blast Furnace Productivity Improvement at BF-8","description":"Current blast furnace productivity stands at ~2.0 t/m³/day with potential for improvement. Develops models including permeability index optimization, charging recommender and descent rate optimization, hearth drainage and tap-to-tap time minimization, coke quality prediction and optimization, and hot blast parameter optimization. Target: ~0.06 Mtpa throughput improvement. Financial impact: INR 30–50 Cr. per annum. Feasibility: 9/10.","l2Initiative":"","inRoadmap":"Yes","financialImpact":0,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC012","plant":"BSP","area":"SMS","initiative":"Ferro Alloy Cost Optimization through Recovery Prediction","description":"Current ferro alloy consumption is ~18.3 kg/t-CS with considerable variation within the same grade. Develops a predictive model using ML to predict alloy recovery rates, identify high-impact parameters, and recommend optimal dosing integrated into a real-time advisory system. Target: ~0.9 kg/tCS reduction for grades contributing to 85% of consumption across both SMS. Financial impact: INR 35–45 Cr. per annum. Feasibility: 8/10.","l2Initiative":"","inRoadmap":"Yes","financialImpact":13,"status":"Model Developed Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-02T11:16:34.831Z","from":"Not Started","to":"Model Developed Stage","note":"","startedChange":"2026-05-02"}],"startedDate":"2026-05-02","goLiveDate":"","hotTrials":"2026-04-01","perfStartDate":"2026-05-01","perfEndDate":"2026-07-01"},{"id":"UC013","plant":"BSP","area":"SMS","initiative":"Video Analytics for Refractory Erosion in Teeming Ladle at SMS-2","description":"Teeming ladles experience premature refractory replacement due to manual wear assessment. Deploys a video analytics-based refractory erosion monitoring system with high-resolution thermal and optical cameras, AI models for erosion pattern detection, and a health index for refractory lining to predict remaining life. Target: ~5 heats increase in teeming ladle life. Financial impact: INR 12–18 Cr. per annum. Feasibility: 5/10.","l2Initiative":"","inRoadmap":"Yes","financialImpact":0,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC014","plant":"BSP","area":"Plate Mill","initiative":"Increase Plate Mill Yield","description":"Current Plate Mill gross yield is ~88% which needs improvement through digitally enabled root cause analysis. Develops a digital root cause analysis system integrating upstream and downstream process data, ML models to identify key parameters contributing to edge cracks, heat-wise visualization of associated drivers, and alerts/SOPs for high-risk combinations. Target: ~2.5% increase in gross yield. Financial impact: INR 80–120 Cr. per annum. Carbon impact: 80–90 ktCO₂/yr. Feasibility: 2.5/10.","l2Initiative":"Defect reduction through defect catgorization","inRoadmap":"Yes","financialImpact":80,"status":"Data Analysis Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-02T11:16:49.694Z","from":"Not Started","to":"Data Collection Stage","note":"","startedChange":"2026-05-02"},{"at":"2026-05-02T11:17:19.567Z","from":"Data Collection Stage","to":"Data Analysis Stage","note":""}],"startedDate":"2026-05-02","goLiveDate":"","hotTrials":"2026-06-01","perfStartDate":"2026-07-01","perfEndDate":"2026-09-01"},{"id":"UC015","plant":"BSP","area":"URM (Universal Rail Mill)","initiative":"Improvement of Yield through Reduction of Cropping Losses by Improving Precision in Rail Length","description":"Current URM gross yield is ~91.6%, with losses from cropping to achieve target 130m rail length. Performs correlation analysis between mill speed, temperature profiles, cooling bed behavior and final rail length deviations, identifies optimal operating windows, develops predictive models for in-process adjustments, identifies quality issues affecting yield, and generates SOPs for repeatability. Target: ~0.9% yield increase. Financial impact: INR 40–60 Cr. per annum. Carbon impact: 20–25 ktCO₂/yr. Feasibility: 7/10.","l2Initiative":"Defect reduction through defect catgorization","inRoadmap":"Yes","financialImpact":0,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC016","plant":"BSP","area":"Safety","initiative":"App-based Real-time Alerts for Unsafe Acts, Safety Violations, Equipment Issues, and Permit Violations with SOS Alerts and Live Recording","description":"AI-powered PPE detection via video analytics, automatic identification of unsafe acts and hazards, mobile app alerts, SOS alerts with geo-tagging, live video/audio recording, and centralized safety dashboard. Non-financial impact: incident response efficiency, PPE compliance rate, near miss capture and reduction. Feasibility: 7/10.","l2Initiative":"","inRoadmap":"Yes","financialImpact":0,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC017","plant":"BSP","area":"Safety","initiative":"AI-enabled Geo-tagged Mobile App for Real-time Capture of Safety Observations","description":"Real-time capture of safety violations and best practices with geo-location tagging, AI-assisted classification, automatic aggregation and visualization on dashboards, early alerts for critical violations, historical analysis and benchmarking, and SOP enforcement support. Feasibility: 8.5/10.","l2Initiative":"","inRoadmap":"Yes","financialImpact":0,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC018","plant":"ISP","area":"Blast Furnace","initiative":"Fuel Rate Reduction Model","description":"The current blast furnace fuel rate stands at ~545 kg/tHM, significantly inflating hot metal production cost. This initiative develops a data-driven model linking fuel rate with key operational parameters to uncover critical contributors to high consumption. Sub-models include silicon prediction and control, heat loss minimization, hot blast parameter optimization, burden charging optimization, oxygen enrichment optimization, and top gas utilization. The target is a ~9 kg/tHM reduction in fuel rate with ~0.03 Mtpa throughput improvement, along with a carbon impact of 60–80 ktCO₂/yr.","l2Initiative":"Blast Furnace Slag Rate Reduction at BF","inRoadmap":"Yes","financialImpact":75,"status":"Model Development Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-02T11:19:23.536Z","from":"Not Started","to":"Model Developed Stage","note":"","startedChange":"2026-05-02"},{"at":"2026-05-04T11:47:21.625Z","from":"Model Developed Stage","to":"Model Development Stage","note":""}],"startedDate":"2026-05-02","goLiveDate":"","hotTrials":"2026-05-01","perfStartDate":"2026-10-01","perfEndDate":"2026-12-01"},{"id":"UC019","plant":"ISP","area":"Sinter Plant","initiative":"Improvement of Sinter Line Productivity via Dynamic Operational Control","description":"This initiative focuses on dynamically controlling sinter plant operations to improve line productivity. It involves real-time monitoring and optimization of key process parameters such as bed permeability, burn-through point (BTP), raw mix composition, and ignition parameters to stabilize operations and increase sinter output. The use case leverages advanced analytics for predictive control of operational setpoints.","l2Initiative":"Fuel Rate Reduction through  Permeability Improvement.","inRoadmap":"Yes","financialImpact":15,"status":"Model Development Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-02T11:19:36.510Z","from":"Not Started","to":"Model Developed Stage","note":"","startedChange":"2026-05-02"},{"at":"2026-05-04T11:47:07.778Z","from":"Model Developed Stage","to":"Model Development Stage","note":""}],"startedDate":"2026-05-02","goLiveDate":"","hotTrials":"2026-06-01","perfStartDate":"2026-10-01","perfEndDate":"2026-12-01"},{"id":"UC020","plant":"ISP","area":"USM (Universal Structural Mill)","initiative":"Yield Improvement through Reduction in Scrap due to Excess Length","description":"The USM currently operates at a gross yield of ~93.7%, with significant losses from cropping of extra length. This initiative deploys a length prediction model to anticipate short sections and optimize shearing decisions, optimizes rolling parameters to reduce short-length instances, develops operator dashboards for length variability and yield trends, establishes SOPs for billet/bloom conditioning, and enables a feedback loop to caster cutting strategy. The target is a ~1.1% increase in yield with a carbon impact of 12–15 ktCO₂/yr.","l2Initiative":"Defect Reduction","inRoadmap":"Yes","financialImpact":10,"status":"Data Collection Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-02T11:19:49.740Z","from":"Not Started","to":"Data Collection Stage","note":"","startedChange":"2026-05-02"}],"startedDate":"2026-05-02","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC021","plant":"ISP","area":"Safety","initiative":"App-based Real-time Alerts for Unsafe Acts, Safety Violations, Equipment Issues, and Permit Violations with SOS Alerts and Live Recording","description":"This initiative addresses the complexity of ensuring consistent PPE usage and safety compliance across a large, diverse workforce. It includes AI-powered PPE detection via video analytics, automatic identification of unsafe acts and potential hazards, mobile app alerts for deviations and unsafe conditions, SOS alerts with geo-tagging for emergency response, live video/audio recording for incident validation, and a centralized safety dashboard for compliance tracking.","l2Initiative":"PPE Detection in Critical Areas","inRoadmap":"Yes","financialImpact":0,"status":"Data Collection Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-02T11:20:08.712Z","from":"Not Started","to":"Data Collection Stage","note":"Vendor meet planned","startedChange":"2026-05-02"}],"startedDate":"2026-05-02","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC022","plant":"RSP","area":"Blast Furnace","initiative":"Blast Furnace Fuel Rate Reduction at BF-5","description":"The current blast furnace fuel rate stands at ~527 kg/tHM, significantly inflating hot metal production cost. This initiative develops a data-driven model linking fuel rate with key operational parameters. Sub-models include silicon prediction and control, heat loss minimization, hot blast parameter optimization, burden charging optimization, oxygen enrichment optimization, and top gas utilization. Target is ~13 kg/tHM fuel rate reduction and ~0.05 Mtpa throughput improvement. Financial impact: INR 90–120 Cr. per annum. Carbon impact: 110–130 ktCO₂/yr. Feasibility: 8.5/10.","l2Initiative":"PCI Rate Optimization","inRoadmap":"Yes","financialImpact":100,"status":"Model Development Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-02T11:14:47.056Z","from":"Not Started","to":"Model Development Stage","note":"","startedChange":"2026-05-02"}],"startedDate":"2026-05-02","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC023","plant":"RSP","area":"SMS","initiative":"Ferro Alloy Consumption Reduction through Recovery Prediction","description":"Current ferro alloy consumption is ~16.7 kg/t-CS with considerable variation within the same grade. This initiative develops a predictive model to optimize ferroalloy usage by maximizing recovery while ensuring target chemistry. Includes ML model to predict alloy recovery rates based on bath temperature, oxygen blowing patterns, slag chemistry, and tapping delay, identification of high-impact parameters influencing poor recovery, and optimal dosing recommendations integrated into a real-time advisory system. Financial impact: INR 30–45 Cr. per annum. Carbon impact: 10–15 ktCO₂/yr. Feasibility: 7/10.","l2Initiative":"","inRoadmap":"Yes","financialImpact":28,"status":"Go-Live Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-02T11:15:16.197Z","from":"Not Started","to":"Go-Live Stage","note":"","startedChange":"2026-05-02"}],"startedDate":"2026-05-02","goLiveDate":"","hotTrials":"2026-03-01","perfStartDate":"2026-04-01","perfEndDate":"2026-06-01"},{"id":"UC024","plant":"RSP","area":"HSM (Hot Strip Mill)","initiative":"Throughput Improvement and Scale Losses Reduction by Optimizing Soaking Time in Furnace","description":"The reheating furnace in HSM acts as a major bottleneck, limiting throughput. Loading slabs of different sizes together increases soaking time as smaller slabs wait for larger ones to heat uniformly. This initiative leverages production planning optimization and furnace scheduling intelligence: analyzing historical furnace data, clustering slabs into optimized size/grade batches, simulating different planning scenarios, and generating dynamic slab charging recommendations. Target is ~0.06 Mtpa throughput increase. Financial impact: INR 30–50 Cr. per annum. Feasibility: 8/10.","l2Initiative":"Throughput Improvement and Slab charging schedule by Optimization in Furnace","inRoadmap":"Yes","financialImpact":35,"status":"Data Collection Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-02T11:15:34.035Z","from":"Not Started","to":"Data Collection Stage","note":"","startedChange":"2026-05-02"}],"startedDate":"2026-05-02","goLiveDate":"","hotTrials":"2026-05-01","perfStartDate":"2026-06-01","perfEndDate":"2026-08-01"},{"id":"UC025","plant":"RSP","area":"Traffic","initiative":"IoT-enabled Loco Health Condition Monitoring to Reduce Loco Downtime","description":"Limited visibility into real-time locomotive health restricts early anomaly detection and proactive maintenance planning. This initiative captures real-time data from key systems (engine temperature, oil pressure, vibration, braking performance, fuel efficiency) through IoT sensors, leverages AI/ML models for predictive maintenance, generates health scores for each loco, provides real-time alerts for abnormal trends, integrates with CMMS/ERP for automatic maintenance ticket generation, and enables historical performance analytics. Financial impact: TBA (subject to vendor discussions). Feasibility: 5.5/10.","l2Initiative":"","inRoadmap":"Yes","financialImpact":0,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC026","plant":"RSP","area":"Safety","initiative":"App-based Real-time Alerts for Unsafe Acts, Safety Violations, Equipment Issues, and Permit Violations with SOS Alerts and Live Recording","description":"Addresses the complexity of ensuring consistent PPE usage and safety compliance across a large workforce. Includes AI-powered PPE detection via video analytics, automatic identification of unsafe acts and hazards, mobile app alerts for deviations and unsafe conditions, SOS alerts with geo-tagging for emergency response, live video/audio recording for incident validation, and centralized safety dashboard for compliance tracking. Non-financial impact: incident response efficiency, PPE compliance rate, near miss capture and reduction. Feasibility: 7/10.","l2Initiative":"","inRoadmap":"Yes","financialImpact":0,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC027","plant":"RSP","area":"Safety","initiative":"AI-enabled Geo-tagged Mobile App for Real-time Capture of Safety Observations","description":"Field-level safety observations are often captured manually, leading to delays and incomplete records. This initiative provides real-time capture with geo-location tagging, AI-assisted classification into categories, automatic aggregation and visualization on dashboards, early alerts for critical violations, historical analysis and benchmarking for trend identification, and SOP enforcement support. Non-financial impact: average time to capture/close observations, corrective actions within SLA, repeat violations reduction. Feasibility: 8.5/10.","l2Initiative":"","inRoadmap":"Yes","financialImpact":0,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC028","plant":"DSP","area":"Sinter Plant","initiative":"Fuel Rate Reduction through BTP Stabilization, Permeability Improvement and FeO Control at SP-2","description":"The current sinter plant fuel rate is ~74 kg/tgs, leading to higher energy cost and emissions. This initiative develops a multi-layered digital solution including a live BTP prediction model to identify and control critical upstream parameters, a FeO classification model to predict good and bad zones for proactive raw mix and ignition adjustments, and SOPs to improve bed permeability based on moisture levels, particle size distribution, and calcined lime dosing. Target is ~5 kg/tgs fuel rate reduction with a carbon impact of 25–30 ktCO₂/yr.","l2Initiative":"","inRoadmap":"Yes","financialImpact":0,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC029","plant":"DSP","area":"Blast Furnace","initiative":"Blast Furnace Fuel Rate Reduction at BF-4","description":"The current blast furnace fuel rate stands at ~534 kg/tHM, significantly inflating hot metal production cost. This initiative develops a data-driven model linking fuel rate with key operational parameters. Sub-models include silicon prediction and control, heat loss minimization, hot blast parameter optimization, burden charging optimization, oxygen enrichment optimization, and top gas utilization. Target is ~10 kg/tHM fuel rate reduction and ~0.02 Mtpa throughput improvement, with a carbon impact of 50–60 ktCO₂/yr. Impact calculated considering BF-4.","l2Initiative":"","inRoadmap":"Yes","financialImpact":50,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-02T11:18:01.954Z","from":"Not Started","to":"Data Collection Stage","note":"","startedChange":"2026-05-02"},{"at":"2026-05-02T11:18:36.301Z","from":"Data Collection Stage","to":"Not Started","note":""}],"startedDate":"2026-05-02","goLiveDate":"","hotTrials":"2026-10-01","perfStartDate":"2026-11-01","perfEndDate":"2027-01-01"},{"id":"UC030","plant":"DSP","area":"Blast Furnace","initiative":"Blast Furnace Productivity Improvement at BF-4","description":"The current blast furnace productivity stands at ~1.8 t/m³/day, with potential for improvement. This initiative develops data-driven models to optimize parameters impacting productivity, including hearth drainage and tap-to-tap time minimization, coke quality prediction and optimization, hot blast parameter optimization, permeability index optimization, and charging recommender and descent rate optimization. Target is ~0.05 Mtpa throughput improvement.","l2Initiative":"","inRoadmap":"Yes","financialImpact":0,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC031","plant":"DSP","area":"SMS","initiative":"Video Analytics-based Length and Weight Measurement System for Billets/Blooms","description":"Current billet/bloom length and weight measurements are performed manually or through offline systems, leading to inaccuracies and inconsistencies. This initiative deploys high-resolution cameras and image analytics for real-time billet/bloom length measurement, AI-based algorithms for auto-detection and dimensional validation, dynamic weight calculation using calibrated process data, immediate alerts for under/over-length billets, automatic tagging and logging into MES/ERP systems, and analytics dashboards for monitoring length distributions and yield losses. Subject to vendor discussions.","l2Initiative":"","inRoadmap":"Yes","financialImpact":0,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC032","plant":"DSP","area":"MSM (Medium Structural Mill)","initiative":"Increase Yield and Throughput by Reducing Short Length and Cross-sectional Tolerances","description":"The Medium Structural Mill currently operates at a gross yield of ~93%, with significant losses from cropping due to final sections falling short of required structure length. This initiative deploys a length prediction model for shearing optimization, optimizes rolling parameters to reduce short-length instances, develops operator dashboards for length variability and yield trends, establishes SOPs for bloom conditioning and section change planning, and enables feedback loop to caster cutting strategy. Target is ~1.2% yield increase with a carbon impact of 15–20 ktCO₂/yr.","l2Initiative":"","inRoadmap":"Yes","financialImpact":15,"status":"Data Collection Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-02T11:17:42.632Z","from":"Not Started","to":"Data Collection Stage","note":"","startedChange":"2026-05-02"}],"startedDate":"2026-05-02","goLiveDate":"","hotTrials":"2026-06-01","perfStartDate":"2026-07-01","perfEndDate":"2026-09-01"},{"id":"UC033","plant":"DSP","area":"Safety","initiative":"App-based Real-time Alerts for Unsafe Acts, Safety Violations, Equipment Issues, and Permit Violations with SOS Alerts and Live Recording","description":"Addresses the complexity of ensuring consistent PPE usage and safety compliance across a large, diverse workforce. Includes AI-powered PPE detection via video analytics, automatic identification of unsafe acts and hazards, mobile app alerts for deviations and unsafe conditions, SOS alerts with geo-tagging for emergency response, live video/audio recording for incident validation, and a centralized safety dashboard for tracking compliance and workforce safety performance.","l2Initiative":"","inRoadmap":"Yes","financialImpact":0,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC034","plant":"DSP","area":"Safety","initiative":"AI-enabled Geo-tagged Mobile App for Real-time Capture of Safety Observations","description":"Field-level safety observations are often captured manually, leading to delays and incomplete records. This initiative provides real-time capture of safety violations and best practices with geo-location tagging, AI-assisted classification of observations, automatic aggregation and visualization on dashboards, early alerts for critical violations, historical analysis and benchmarking to identify trends and hotspots, and SOP enforcement support for continuous improvement in safety practices.","l2Initiative":"","inRoadmap":"Yes","financialImpact":0,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC035","plant":"DSP","area":"SMS","initiative":"Ferro Alloy Consumption Reduction through Recovery Prediction","description":"This initiative develops a predictive model to optimize ferroalloy usage by maximizing recovery, including ML model for alloy recovery rates, identification of high-impact parameters, and optimal dosing recommendations integrated into a real-time advisory system.","l2Initiative":"Ferro Alloy Cost Optimization through Recovery Prediction","inRoadmap":"No","financialImpact":20,"status":"Model Development Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-02T11:18:26.322Z","from":"Not Started","to":"Model Developed Stage","note":"","startedChange":"2026-05-02"},{"at":"2026-05-02T11:18:48.404Z","from":"Model Developed Stage","to":"Model Development Stage","note":""}],"startedDate":"2026-05-02","goLiveDate":"","hotTrials":"2026-05-01","perfStartDate":"2026-06-01","perfEndDate":"2026-08-01"},{"id":"UC036","plant":"BSL","area":"Blast Furnace","initiative":"Blast Furnace Fuel Rate Reduction at BF-2 (Slag Rate via HMT Improvement)","description":"Alternative pathway for BF-2 fuel rate reduction by improving Hot Metal Temperature (HMT). Targets slag rate reduction through improved thermal control. Currently outside main roadmap but tracked for future consideration. Estimated financial impact INR 25 Cr per annum.","l2Initiative":"Slag Rate Reduction by HMT Improvement","inRoadmap":"No","financialImpact":25,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"2026-08-01","perfStartDate":"2026-10-01","perfEndDate":"2026-12-01"},{"id":"UC037","plant":"BSL","area":"Blast Furnace","initiative":"Blast Furnace Fuel Rate Reduction at BF-2 (HBT Improvement)","description":"Alternative pathway for BF-2 fuel rate reduction through Hot Blast Temperature (HBT) optimization. Currently outside main roadmap but tracked for future consideration. Estimated financial impact INR 30 Cr per annum.","l2Initiative":"HBT Improvement","inRoadmap":"No","financialImpact":30,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"2026-09-01","perfStartDate":"2026-10-01","perfEndDate":"2026-12-01"},{"id":"UC038","plant":"BSL","area":"Blast Furnace","initiative":"Blast Furnace Fuel Rate Reduction at BF-2 (Pellet Increase)","description":"Alternative pathway for BF-2 fuel rate reduction by increasing pellet ratio in burden. Currently outside main roadmap but tracked for future consideration. Estimated financial impact INR 30 Cr per annum.","l2Initiative":"Pellet Increase in Burden","inRoadmap":"No","financialImpact":30,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"2026-09-01","perfStartDate":"2026-10-01","perfEndDate":"2026-12-01"},{"id":"UC039","plant":"BSL","area":"Blast Furnace","initiative":"Blast Furnace Fuel Rate Reduction at BF-4","description":"Future opportunity for fuel rate reduction at BF-4. Currently outside main roadmap; sub-initiative scope to be determined based on operational analysis. Estimated financial impact INR 60 Cr per annum.","l2Initiative":"TBD","inRoadmap":"No","financialImpact":60,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC040","plant":"BSP","area":"Blast Furnace","initiative":"Blast Furnace Fuel Rate Reduction at BF-7","description":"Future opportunity for fuel rate reduction at BF-7. Currently outside main roadmap; sub-initiative scope to be determined. Estimated financial impact INR 75 Cr per annum.","l2Initiative":"TBD","inRoadmap":"No","financialImpact":75,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""},{"id":"UC041","plant":"BSP","area":"URM (Universal Rail Mill)","initiative":"URM Yield Improvement through Defect Reduction","description":"Alternative URM yield improvement pathway via defect reduction modeling, complementing the cropping-loss reduction initiative. Currently outside main roadmap. Estimated financial impact INR 20 Cr per annum.","l2Initiative":"Defect Reduction Model","inRoadmap":"No","financialImpact":20,"status":"Data Analysis Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-02T11:17:08.704Z","from":"Not Started","to":"Data Analysis Stage","note":"","startedChange":"2026-05-02"}],"startedDate":"2026-05-02","goLiveDate":"","hotTrials":"2026-05-01","perfStartDate":"2026-06-01","perfEndDate":"2026-08-01"},{"id":"UC042","plant":"Central","area":"Logistics","initiative":"Iron Ore Freight Optimization","description":"Optimization of iron ore freight contracts and movement across plants and sources to minimize landed cost. Currently live and delivering value. Financial impact: INR 30 Cr per annum.","l2Initiative":"","inRoadmap":"Yes","financialImpact":30,"status":"Go-Live Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-03-01T00:00:00.000Z","from":"Not Started","to":"Go-Live Stage","note":"Already live as per V3 deployment plan","goLiveChange":"2026-03-01","perfChange":"2026-03-01","perfEndChange":"2026-06-01","hotChange":"2026-03-01","startedChange":"2026-03-01"}],"startedDate":"2026-03-01","goLiveDate":"2026-03-01","hotTrials":"2026-03-01","perfStartDate":"2026-03-01","perfEndDate":"2026-06-01"},{"id":"UC043","plant":"Central","area":"Logistics","initiative":"Coal Differential Freight Model","description":"Differential freight model for coal logistics to optimise routing and contract selection across coal sources. Targeted deployment: April 2026. Financial impact: INR 40 Cr per annum.","l2Initiative":"Coal differential freight model","inRoadmap":"Yes","financialImpact":40,"status":"Model Developed Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-04T11:46:20.590Z","from":"Not Started","to":"Model Developed Stage","note":"","startedChange":"2026-05-04"}],"startedDate":"2026-05-04","goLiveDate":"","hotTrials":"2026-04-01","perfStartDate":"2026-05-01","perfEndDate":"2026-07-01"},{"id":"UC044","plant":"Central","area":"Marketing & Sales","initiative":"Price Rationalization Model","description":"Data-driven price rationalization across product portfolio and customer segments to maximise realisation. Targeted deployment: May 2026. Financial impact: INR 80 Cr per annum.","l2Initiative":"Price rationalization model","inRoadmap":"Yes","financialImpact":80,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"2026-05-01","perfStartDate":"2026-06-01","perfEndDate":"2026-08-01"},{"id":"UC045","plant":"Central","area":"Marketing & Sales","initiative":"Product Mix Optimization Model","description":"Optimisation of product mix across plants to maximise margin given demand, capacity, and grade-wise contribution constraints. Targeted deployment: June 2026. Financial impact: INR 70 Cr per annum.","l2Initiative":"Product mix optimization model","inRoadmap":"Yes","financialImpact":70,"status":"Not Started","owner":"","targetDate":"","notes":"","history":[],"startedDate":"","goLiveDate":"","hotTrials":"2026-06-01","perfStartDate":"2026-07-01","perfEndDate":"2026-09-01"},{"id":"UC046","plant":"Central","area":"Logistics","initiative":"Coal Base Freight Optimization (CFR Contracting)","description":"Coal base freight optimisation through CFR contracting strategy across import sources. Targeted deployment: July 2026. Financial impact: INR 150 Cr per annum.","l2Initiative":"CFR contracting","inRoadmap":"Yes","financialImpact":150,"status":"Data Collection Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-04T06:41:32.251Z","from":"Not Started","to":"Data Collection Stage","note":"","startedChange":"2026-05-04"}],"startedDate":"2026-05-04","goLiveDate":"","hotTrials":"2026-07-01","perfStartDate":"2026-08-01","perfEndDate":"2026-10-01"},{"id":"UC047","plant":"Mining","area":"Mines","initiative":"Model Mine: Bolani","description":"Bolani model mine programme: WiFi network rollout, Fleet Management System (FMS), predictive maintenance for HEMM, and Collision Management System (CMS). Vendor-led implementation. Financial impact: INR 70 Cr per annum.","l2Initiative":"Wifi Network + FMS + Predictive Maintenance + CMS","inRoadmap":"Yes","financialImpact":70,"status":"Model Development Stage","owner":"","targetDate":"","notes":"","history":[{"at":"2026-05-04T06:42:44.130Z","from":"Not Started","to":"Model Development Stage","note":"","startedChange":"2026-05-04"}],"startedDate":"2026-05-04","goLiveDate":"","hotTrials":"","perfStartDate":"","perfEndDate":""}];
+const STATUSES = ["Not Started","Data Collection Stage","Data Analysis Stage","Model Development Stage","Model Developed Stage","Go-Live Stage"];
+const PLANTS_FULL = {BSP:"Bhilai Steel Plant",BSL:"Bokaro Steel Plant",DSP:"Durgapur Steel Plant",RSP:"Rourkela Steel Plant",ISP:"IISCO Steel Plant",Central:"Central Function",Mining:"Mining"};
+const STORAGE_KEY = "uc_tracker_pub_mor538gf";
+let DATA = [];
+let memoryFallback = false;
+
+function migrate(arr){
+  // Map any legacy/renamed statuses onto the current pipeline.
+  // The default state is "Not Started" — any case that hasn't been progressed shows as Not Started.
+  // Old stage names are renamed to the new "... Stage" labels.
+  // "Awaiting Hot Trials" and "Model Ready - Awaiting Clearance" are both merged into "Model Developed Stage".
+  const map = {
+    "Started": "Not Started",
+    "In Data Collection": "Data Collection Stage",
+    "In Data Analysis": "Data Analysis Stage",
+    "Model Development": "Model Development Stage",
+    "Awaiting Hot Trials": "Model Developed Stage",
+    "Model Ready - Awaiting Clearance": "Model Developed Stage",
+    "Go-Live": "Go-Live Stage"
+  };
+  let changed = 0;
+  arr.forEach(c => {
+    if(c && map[c.status]){ c.status = map[c.status]; changed++; }
+    // Also migrate status names inside history records
+    if(c && Array.isArray(c.history)){
+      c.history.forEach(h => {
+        if(h.from && map[h.from]) h.from = map[h.from];
+        if(h.to && map[h.to]) h.to = map[h.to];
+      });
+    }
+    // Also ensure newly-added fields exist
+    if(c.startedDate === undefined) c.startedDate = '';
+    if(c.goLiveDate === undefined) c.goLiveDate = '';
+    if(c.perfStartDate === undefined) c.perfStartDate = '';
+    // Fields added in v4 (from Consolidated Target Value Tracker - May 26)
+    if(c.inRoadmap === undefined) c.inRoadmap = '';
+    if(c.financialImpact === undefined) c.financialImpact = '';
+    if(c.hotTrials === undefined) c.hotTrials = '';
+    if(c.perfEndDate === undefined) c.perfEndDate = '';
+    if(!Array.isArray(c.history)) c.history = [];
+    // For pre-existing records that match a SEED record, backfill the
+    // tracker values so users see the latest target inputs without losing
+    // their own status updates / owners / notes.
+    const seedRef = SEED.find(s => s.id === c.id);
+    if(seedRef){
+      ['inRoadmap','financialImpact','hotTrials','perfEndDate'].forEach(k => {
+        if((c[k] === '' || c[k] === undefined || c[k] === null) && seedRef[k] !== '' && seedRef[k] !== undefined){
+          c[k] = seedRef[k]; changed++;
+        }
+      });
+      // perfStartDate may also need backfill if user hasn't set one
+      if((!c.perfStartDate) && seedRef.perfStartDate){ c.perfStartDate = seedRef.perfStartDate; changed++; }
+    }
+  });
+  // Ensure all SEED cases exist in the user's data — so newly-added cases
+  // (added in later versions of this file) automatically appear for existing
+  // users without overwriting their saved updates on other cases.
+  const existingIds = new Set(arr.map(c => c && c.id).filter(Boolean));
+  SEED.forEach(s => {
+    if(!existingIds.has(s.id)){
+      arr.push(JSON.parse(JSON.stringify(s)));
+      changed++;
+    }
+  });
+  return changed;
+}
+function loadData(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ DATA = JSON.parse(raw); migrate(DATA); saveData(); return; }
+  }catch(e){ memoryFallback = true; }
+  DATA = JSON.parse(JSON.stringify(SEED));
+  saveData();
+}
+function saveData(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); }
+  catch(e){ memoryFallback = true; }
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(window._tt); window._tt = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+function setView(v){
+  document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active', el.dataset.view===v));
+  document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active', el.id==='view-'+v));
+  if(v==='reports') renderReports();
+}
+function statusClass(s){ return 's-' + s.toLowerCase().replace(/\s+/g,'-'); }
+function plantChip(p){ return `<span class="chip chip-${p.toLowerCase()}">${p}</span>`; }
+function statusBadge(s){ return `<span class="status ${statusClass(s)}">${s}</span>`; }
+function fmtDate(iso){ if(!iso) return ''; const d=new Date(iso); return d.toLocaleDateString('en-GB',{month:'short',year:'numeric'}); }
+function isFutureMonth(iso){
+  // True when the month/year of the given date falls AFTER the current month/year.
+  // The current month is treated as "now" (not future) so dates within the same month
+  // don't render as planned.
+  if(!iso) return false;
+  const s = iso.length === 7 ? iso + '-01' : iso;
+  const d = new Date(s);
+  if(isNaN(d.getTime())) return false;
+  const today = new Date();
+  if(d.getFullYear() !== today.getFullYear()) return d.getFullYear() > today.getFullYear();
+  return d.getMonth() > today.getMonth();
+}
+function fmtDateTime(iso){ if(!iso) return ''; const d=new Date(iso); return d.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function getFilters(){
+  return {
+    q: document.getElementById('f-search').value.toLowerCase().trim(),
+    plant: document.getElementById('f-plant').value,
+    area: document.getElementById('f-area').value,
+    status: document.getElementById('f-status').value,
+    roadmap: document.getElementById('f-roadmap').value,
+    sort: document.getElementById('f-sort').value
+  };
+}
+function applyFilters(){
+  const f = getFilters();
+  let r = DATA.filter(c => {
+    if(f.plant && c.plant !== f.plant) return false;
+    if(f.area && c.area !== f.area) return false;
+    if(f.status){
+      if(f.status === '__started__'){
+        // "Started" badge — any case that has moved past the default "Not Started" state
+        if(c.status === 'Not Started') return false;
+      } else if(c.status !== f.status){
+        return false;
+      }
+    }
+    if(f.q){
+      const blob = (c.id+' '+c.plant+' '+c.area+' '+c.initiative+' '+(c.l2Initiative||'')+' '+c.description).toLowerCase();
+      if(!blob.includes(f.q)) return false;
+    }
+    if(f.roadmap && c.inRoadmap !== f.roadmap) return false;
+    return true;
+  });
+  if(f.sort==='plant') r.sort((a,b)=> a.plant.localeCompare(b.plant) || a.id.localeCompare(b.id));
+  else if(f.sort==='status') r.sort((a,b)=> STATUSES.indexOf(a.status) - STATUSES.indexOf(b.status));
+  else if(f.sort==='financialImpact'){
+    const fi = c => (typeof c.financialImpact === 'number' ? c.financialImpact : -1);
+    r.sort((a,b)=> fi(b) - fi(a) || a.id.localeCompare(b.id));
+  }
+  else if(f.sort==='updated'){
+    const lu = c => c.history.length ? c.history[c.history.length-1].at : '0';
+    r.sort((a,b)=> lu(b).localeCompare(lu(a)));
+  }
+  return r;
+}
+function fillSelect(id, vals, current){
+  const el = document.getElementById(id);
+  const cur = current || el.value;
+  el.innerHTML = el.querySelector('option[value=""]').outerHTML + vals.map(v=>`<option value="${escapeHtml(v)}"${v===cur?' selected':''}>${escapeHtml(v)}</option>`).join('');
+}
+function renderStats(){
+  const counts = {Total: DATA.length};
+  STATUSES.forEach(s => counts[s] = DATA.filter(c=>c.status===s).length);
+  // "Started" tab is cumulative — counts every case that has progressed into any active phase
+  // (i.e., everything except cases still sitting at the default "Not Started" status).
+  const PHASES = ["Data Collection Stage","Data Analysis Stage","Model Development Stage","Model Developed Stage","Go-Live Stage"];
+  counts['Started'] = DATA.filter(c => PHASES.includes(c.status)).length;
+  // v4: roadmap and financial impact summary
+  counts['InRoadmap'] = DATA.filter(c => c.inRoadmap === 'Yes').length;
+  // Total target value committed in the roadmap (sum of in-roadmap financial impact).
+  const roadmapTargetValue = DATA.filter(c => c.inRoadmap === 'Yes')
+                                  .reduce((sum,c) => sum + (typeof c.financialImpact === 'number' ? c.financialImpact : 0), 0);
+  const totalFinImpact = DATA.reduce((sum,c) => sum + (typeof c.financialImpact === 'number' ? c.financialImpact : 0), 0);
+  // Financial impact is only "real" once a use case has reached Go-Live — earlier
+  // stages are forecast/potential. We show realized (Go-Live) over the total potential.
+  const realizedFinImpact = DATA.filter(c => c.status === 'Go-Live Stage')
+                                .reduce((sum,c) => sum + (typeof c.financialImpact === 'number' ? c.financialImpact : 0), 0);
+  const items = [
+    {key:'Total', label:'Total', cls:'stat-total', filter:''},
+    {key:'InRoadmap', label:'In Target Value List', cls:'stat-roadmap', filter:'__roadmap_yes__', value: counts['InRoadmap']},
+    {key:'FinImpact', label:'Realized Impact', cls:'stat-finance', filter:'', value: `₹${realizedFinImpact}<span class="unit"> / ₹${totalFinImpact} Cr/yr</span>`, raw:true},
+    {key:'Started', label:'Started', cls:'stat-started', filter:'__started__'},
+    {key:'Go-Live Stage', label:'Go-Live Stage', cls:'stat-golive', filter:'Go-Live Stage'},
+    {key:'Data Collection Stage', label:'Data Collection Stage', cls:'stat-datacoll stat-small', filter:'Data Collection Stage'},
+    {key:'Data Analysis Stage', label:'Data Analysis Stage', cls:'stat-dataana stat-small', filter:'Data Analysis Stage'},
+    {key:'Model Development Stage', label:'Model Dev Stage', cls:'stat-modeldev stat-small', filter:'Model Development Stage'},
+    {key:'Model Developed Stage', label:'Model Developed Stage', cls:'stat-clearance stat-small', filter:'Model Developed Stage'}
+  ];
+  const currentFilter = document.getElementById('f-status').value;
+  const currentRoadmap = document.getElementById('f-roadmap').value;
+  document.getElementById('stats').innerHTML = items.map(i => {
+    let isSelected;
+    if(i.filter === '__roadmap_yes__') isSelected = currentRoadmap === 'Yes';
+    else if(i.key === 'Total') isSelected = !currentFilter && !currentRoadmap;
+    else isSelected = i.filter === currentFilter;
+    const title = i.key === 'Total'
+      ? 'Show all use cases'
+      : (i.key === 'Started' ? 'Counter: cases whose status has moved away from "Not Started" via the dropdown. Click to filter.'
+        : (i.filter === '__roadmap_yes__' ? `Total value committed in target value list: ₹${roadmapTargetValue} Cr/yr across ${counts['InRoadmap']} cases. Click to filter.`
+        : (i.key === 'FinImpact' ? `Realized impact from Go-Live cases (₹${realizedFinImpact} Cr) out of total target ₹${totalFinImpact} Cr/yr` : `Filter by ${i.label} (click again to clear)`)));
+    const valHtml = i.raw ? i.value : (i.value !== undefined ? i.value : counts[i.key]);
+    const onClick = i.filter === '__roadmap_yes__' ? `selectRoadmapBadge('Yes')`
+      : (i.key === 'FinImpact' ? '' : `selectStatBadge('${i.filter}')`);
+    const role = onClick ? 'button' : '';
+    const tabIdx = onClick ? '0' : '-1';
+    const keyHandler = onClick ? `onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();${onClick.replace(/'/g,"\\'")}}"` : '';
+    const clickHandler = onClick ? `onclick="${onClick}"` : 'style="cursor:default"';
+    return `<div class="stat ${i.cls}${isSelected?' selected':''}" role="${role}" tabindex="${tabIdx}" title="${title}" ${clickHandler} ${keyHandler}>
+      <div class="lbl">${i.label}</div><div class="val">${valHtml}</div>
+    </div>`;
+  }).join('');
+}
+function selectRoadmapBadge(val){
+  const sel = document.getElementById('f-roadmap');
+  if(sel.value === val) sel.value = '';
+  else sel.value = val;
+  render();
+}
+function selectStatBadge(filterValue){
+  const sel = document.getElementById('f-status');
+  // Toggle off if the same specific filter is clicked again. "Total" (empty filter) is a no-op when already empty.
+  if(sel.value === filterValue && filterValue !== ''){
+    sel.value = '';
+  } else {
+    sel.value = filterValue;
+  }
+  render();
+}
+function render(){
+  renderStats();
+  const plants = [...new Set(DATA.map(c=>c.plant))].sort();
+  const areas = [...new Set(DATA.map(c=>c.area))].sort();
+  fillSelect('f-plant', plants);
+  fillSelect('f-area', areas);
+  const list = applyFilters();
+  document.getElementById('count-shown').textContent = list.length;
+  document.getElementById('count-total').textContent = DATA.length;
+  const wrap = document.getElementById('cases-list');
+  if(!list.length){ wrap.innerHTML = '<div class="empty">No use cases match your filters.</div>'; return; }
+  wrap.innerHTML = list.map(c => caseHtml(c)).join('');
+}
+function suggestStatusHint(c){
+  // Only suggest when the case hasn't been actively progressed yet.
+  if(c.status !== 'Not Started') return '';
+  const today = new Date(); today.setHours(0,0,0,0);
+  const parse = d => d ? new Date(d+'T00:00:00') : null;
+  const ht = parse(c.hotTrials), ps = parse(c.perfStartDate), pe = parse(c.perfEndDate);
+  let suggested = null, why = '';
+  if(pe && today >= pe){ suggested = 'Go-Live Stage'; why = 'performance window has ended'; }
+  else if(ps && today >= ps){ suggested = 'Go-Live Stage'; why = 'performance window has started'; }
+  else if(ht && today >= ht){ suggested = 'Model Developed Stage'; why = 'hot trials date has passed'; }
+  else if(ht || ps || pe){
+    // Future-planned: suggest the earliest planned stage based on what's set
+    suggested = 'Data Collection Stage'; why = 'tracker dates indicate planned activity';
+  }
+  if(!suggested) return '';
+  return `<div class="status-helper">💡 Suggested based on tracker: <a onclick="setStatusSuggestion('${c.id}','${suggested}')">${suggested}</a> <span style="color:var(--muted)">— ${why}</span></div>`;
+}
+function setStatusSuggestion(id, val){
+  const sel = document.getElementById('upd-status-'+id);
+  if(sel){ sel.value = val; }
+}
+function caseHtml(c){
+  const lastUpd = c.history.length ? c.history[c.history.length-1] : null;
+  const pills = [];
+  // Hot Trials turns green once the case has gone live (a Go-Live case implies
+  // hot trials are completed, regardless of the recorded date).
+  const hotDone = c.status === 'Go-Live Stage';
+  if(typeof c.financialImpact === 'number') pills.push(`<span class="date-pill fin"><span class="lbl">Impact</span> ₹${c.financialImpact} Cr</span>`);
+  if(c.hotTrials){
+    const cls = hotDone ? 'hot done' : ('hot' + (isFutureMonth(c.hotTrials)?' future':''));
+    pills.push(`<span class="date-pill ${cls}"><span class="lbl">Hot Trials${hotDone?' ✓':''}</span> ${fmtDate(c.hotTrials)}</span>`);
+  }
+  if(c.goLiveDate) pills.push(`<span class="date-pill live${isFutureMonth(c.goLiveDate)?' future':''}"><span class="lbl">Go-Live</span> ${fmtDate(c.goLiveDate)}</span>`);
+  if(c.perfStartDate) pills.push(`<span class="date-pill perf${isFutureMonth(c.perfStartDate)?' future':''}"><span class="lbl">Perf Start</span> ${fmtDate(c.perfStartDate)}</span>`);
+  if(c.perfEndDate) pills.push(`<span class="date-pill perfend${isFutureMonth(c.perfEndDate)?' future':''}"><span class="lbl">Perf End</span> ${fmtDate(c.perfEndDate)}</span>`);
+  const roadmapBadge = c.inRoadmap === 'Yes'
+    ? '<span class="roadmap-badge yes" title="Part of plant target value list">In Target Value List</span>'
+    : (c.inRoadmap === 'No' ? '<span class="roadmap-badge no" title="Not currently in plant target value list">Not in Target Value List</span>' : '');
+  return `
+  <div class="case" id="case-${c.id}">
+    <div class="case-row" onclick="toggleCase('${c.id}')">
+      <div class="case-id">${c.id}</div>
+      <div>${plantChip(c.plant)}</div>
+      <div class="case-area">${escapeHtml(c.area)}</div>
+      <div>
+        <div class="case-title">${escapeHtml(c.initiative)}</div>
+        ${c.l2Initiative?`<div class="case-l2"><span class="l2-tag">L2</span> ${escapeHtml(c.l2Initiative)}</div>`:''}
+        ${c.owner?`<div class="case-area">Owner: ${escapeHtml(c.owner)}</div>`:''}
+        ${(roadmapBadge || pills.length)?`<div class="date-pills">${roadmapBadge}${pills.join('')}</div>`:''}
+      </div>
+      <div>${statusBadge(c.status)}</div>
+      <div class="caret">▶</div>
+    </div>
+    <div class="case-detail">
+      <div class="detail-grid">
+        <div>
+          <div class="section-label">Plant</div>
+          <div style="margin-bottom:14px">${escapeHtml(PLANTS_FULL[c.plant]||c.plant)} <span style="color:var(--text-3)">(${c.plant})</span></div>
+          <div class="section-label">Target Values <span style="font-weight:400;color:var(--text-3);text-transform:none;letter-spacing:0;font-size:11px">(from Consolidated Tracker)</span></div>
+          <div class="target-grid">
+            <div>
+              <div class="ti-lbl">Target Value List</div>
+              <div class="ti-val ${c.inRoadmap==='Yes'?'roadmap-yes':(c.inRoadmap==='No'?'roadmap-no':'empty')}">${c.inRoadmap || '—'}</div>
+            </div>
+            <div>
+              <div class="ti-lbl">Financial Impact</div>
+              <div class="ti-val ${typeof c.financialImpact==='number'?'fin':'empty'}">${typeof c.financialImpact==='number' ? '₹'+c.financialImpact+' Cr/yr' : '—'}</div>
+            </div>
+          </div>
+          <div class="section-label">Key Dates</div>
+          <div class="date-display">
+            <div><div class="di-lbl">Hot Trials</div><div class="di-val ${c.hotTrials?'':'empty'}">${c.hotTrials?fmtDate(c.hotTrials):'—'}</div></div>
+            <div><div class="di-lbl">Go-Live</div><div class="di-val ${c.goLiveDate?'':'empty'}">${c.goLiveDate?fmtDate(c.goLiveDate):'—'}</div></div>
+            <div><div class="di-lbl">Performance Start</div><div class="di-val ${c.perfStartDate?'':'empty'}">${c.perfStartDate?fmtDate(c.perfStartDate):'—'}</div></div>
+            <div><div class="di-lbl">Performance End</div><div class="di-val ${c.perfEndDate?'':'empty'}">${c.perfEndDate?fmtDate(c.perfEndDate):'—'}</div></div>
+          </div>
+          ${c.l2Initiative?`<div class="section-label">L2 Initiative</div><div style="margin-bottom:14px;color:var(--text)">${escapeHtml(c.l2Initiative)}</div>`:''}
+          <div class="section-label">Use Case Description</div>
+          <div class="desc">${escapeHtml(c.description)}</div>
+        </div>
+        <div>
+          <div class="update-panel">
+            <h4>Update Status</h4>
+            <div class="field">
+              <label>Status</label>
+              <select id="upd-status-${c.id}">
+                ${STATUSES.map(s=>`<option ${s===c.status?'selected':''}>${s}</option>`).join('')}
+              </select>
+              ${suggestStatusHint(c)}
+            </div>
+            <div class="field">
+              <label>Owner / Lead</label>
+              <input type="text" id="upd-owner-${c.id}" value="${escapeHtml(c.owner)}" placeholder="Person responsible">
+            </div>
+            <div class="dates-grid">
+              <div class="field">
+                <label>Target Value List</label>
+                <select id="upd-roadmap-${c.id}">
+                  <option value="" ${!c.inRoadmap?'selected':''}>—</option>
+                  <option value="Yes" ${c.inRoadmap==='Yes'?'selected':''}>Yes (In Target Value List)</option>
+                  <option value="No" ${c.inRoadmap==='No'?'selected':''}>No (Not in Target Value List)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Financial Impact (₹ Cr/yr)</label>
+                <input type="number" step="any" id="upd-finimpact-${c.id}" value="${typeof c.financialImpact==='number'?c.financialImpact:''}" placeholder="e.g. 50">
+              </div>
+              <div class="field">
+                <label>Hot Trials</label>
+                <input type="month" id="upd-hot-${c.id}" value="${(c.hotTrials||'').slice(0,7)}">
+              </div>
+              <div class="field">
+                <label>Go-Live</label>
+                <input type="month" id="upd-golive-${c.id}" value="${(c.goLiveDate||'').slice(0,7)}">
+              </div>
+              <div class="field">
+                <label>Performance Start</label>
+                <input type="month" id="upd-perf-${c.id}" value="${(c.perfStartDate||'').slice(0,7)}">
+              </div>
+              <div class="field">
+                <label>Performance End</label>
+                <input type="month" id="upd-perfend-${c.id}" value="${(c.perfEndDate||'').slice(0,7)}">
+              </div>
+            </div>
+            <div class="field">
+              <label>Update Note</label>
+              <textarea id="upd-note-${c.id}" placeholder="What happened in this update?"></textarea>
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="saveUpdate('${c.id}')">Save Update</button>
+          </div>
+          <div class="history">
+            <h5>Update History (${c.history.length})</h5>
+            <div class="hist-list">
+              ${c.history.length ? [...c.history].reverse().map(h=>histItem(h)).join('') : '<div class="hist-item" style="color:var(--text-3)">No updates yet.</div>'}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+function histItem(h){
+  let chg = '';
+  if(h.from && h.to && h.from !== h.to) chg = `Status: <b>${escapeHtml(h.from)}</b> → <b>${escapeHtml(h.to)}</b>`;
+  else if(h.to) chg = `Status: <b>${escapeHtml(h.to)}</b>`;
+  const extras = [];
+  if(h.ownerChange !== undefined) extras.push(`Owner: ${escapeHtml(h.ownerChange||'(cleared)')}`);
+  if(h.startedChange !== undefined) extras.push(`Started: ${h.startedChange?fmtDate(h.startedChange):'(cleared)'}`);
+  if(h.targetChange !== undefined) extras.push(`Target: ${h.targetChange?fmtDate(h.targetChange):'(cleared)'}`);
+  if(h.goLiveChange !== undefined) extras.push(`Go-Live: ${h.goLiveChange?fmtDate(h.goLiveChange):'(cleared)'}`);
+  if(h.perfChange !== undefined) extras.push(`Perf Start: ${h.perfChange?fmtDate(h.perfChange):'(cleared)'}`);
+  if(h.perfEndChange !== undefined) extras.push(`Perf End: ${h.perfEndChange?fmtDate(h.perfEndChange):'(cleared)'}`);
+  if(h.hotChange !== undefined) extras.push(`Hot Trials: ${h.hotChange?fmtDate(h.hotChange):'(cleared)'}`);
+  if(h.roadmapChange !== undefined) extras.push(`Target Value List: ${h.roadmapChange||'(cleared)'}`);
+  if(h.finChange !== undefined) extras.push(`Financial Impact: ${h.finChange===''?'(cleared)':'₹'+h.finChange+' Cr/yr'}`);
+  return `<div class="hist-item">
+    <div class="hist-time">${fmtDateTime(h.at)}</div>
+    <div class="hist-change">${chg||'Update logged'}</div>
+    ${extras.length?`<div class="hist-note">${extras.join(' · ')}</div>`:''}
+    ${h.note?`<div class="hist-note">"${escapeHtml(h.note)}"</div>`:''}
+  </div>`;
+}
+function toggleCase(id){
+  const el = document.getElementById('case-'+id);
+  document.querySelectorAll('.case.expanded').forEach(e=>{ if(e!==el) e.classList.remove('expanded'); });
+  el.classList.toggle('expanded');
+}
+function saveUpdate(id){
+  const c = DATA.find(x=>x.id===id);
+  if(!c) return;
+  // Convert "YYYY-MM" from <input type="month"> to "YYYY-MM-01" for storage so
+  // existing date-comparison logic and fmtDate continue to work seamlessly.
+  const monthVal = el => {
+    const v = document.getElementById(el).value;
+    return v ? (v.length === 7 ? v + '-01' : v) : '';
+  };
+  const newStatus = document.getElementById('upd-status-'+id).value;
+  const newOwner = document.getElementById('upd-owner-'+id).value.trim();
+  const newGoLive = monthVal('upd-golive-'+id);
+  const newPerf = monthVal('upd-perf-'+id);
+  const newPerfEnd = monthVal('upd-perfend-'+id);
+  const newHot = monthVal('upd-hot-'+id);
+  const newRoadmap = document.getElementById('upd-roadmap-'+id).value;
+  const finRaw = document.getElementById('upd-finimpact-'+id).value;
+  const newFin = finRaw === '' ? '' : Number(finRaw);
+  const note = document.getElementById('upd-note-'+id).value.trim();
+  const curFin = (typeof c.financialImpact === 'number') ? c.financialImpact : '';
+  const changed = newStatus !== c.status || newOwner !== c.owner ||
+                  newGoLive !== (c.goLiveDate||'') || newPerf !== (c.perfStartDate||'') ||
+                  newPerfEnd !== (c.perfEndDate||'') || newHot !== (c.hotTrials||'') ||
+                  newRoadmap !== (c.inRoadmap||'') || newFin !== curFin || note;
+  if(!changed){ toast('No changes to save'); return; }
+  const h = { at: new Date().toISOString(), from: c.status, to: newStatus, note: note };
+  if(newOwner !== c.owner) h.ownerChange = newOwner;
+  if(newGoLive !== (c.goLiveDate||'')) h.goLiveChange = newGoLive;
+  if(newPerf !== (c.perfStartDate||'')) h.perfChange = newPerf;
+  if(newPerfEnd !== (c.perfEndDate||'')) h.perfEndChange = newPerfEnd;
+  if(newHot !== (c.hotTrials||'')) h.hotChange = newHot;
+  if(newRoadmap !== (c.inRoadmap||'')) h.roadmapChange = newRoadmap;
+  if(newFin !== curFin) h.finChange = newFin;
+  // "Started" is now derived from status — when status leaves "Not Started",
+  // stamp the moment of that transition so the Started counter on stats can
+  // remain anchored to a clear timeline.
+  if(c.status === 'Not Started' && newStatus !== 'Not Started' && !c.startedDate){
+    c.startedDate = new Date().toISOString().slice(0,10);
+    h.startedChange = c.startedDate;
+  }
+  c.history.push(h);
+  c.status = newStatus; c.owner = newOwner;
+  c.goLiveDate = newGoLive; c.perfStartDate = newPerf;
+  c.perfEndDate = newPerfEnd; c.hotTrials = newHot;
+  c.inRoadmap = newRoadmap; c.financialImpact = newFin;
+  saveData();
+  render();
+  const el = document.getElementById('case-'+id);
+  if(el) el.classList.add('expanded');
+  toast('Update saved');
+}
+/* Reports */
+function renderReports(){
+  const dist = STATUSES.map(s => ({status:s, count: DATA.filter(c=>c.status===s).length}));
+  const total = DATA.length;
+  const colorMap = {
+    "Not Started":"#d92d20",
+    "Data Collection Stage":"#0891b2",
+    "Data Analysis Stage":"#0ea5e9",
+    "Model Development Stage":"#6366f1",
+    "Model Developed Stage":"#ea580c",
+    "Go-Live Stage":"#039855"
+  };
+  document.getElementById('status-dist').innerHTML = dist.map(d => {
+    const pct = total ? Math.round(d.count/total*100) : 0;
+    return `<div class="bar-row">
+      <div>${d.status}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${colorMap[d.status]}"></div></div>
+      <div class="bar-count">${d.count} (${pct}%)</div>
+    </div>`;
+  }).join('');
+  const plants = [...new Set(DATA.map(c=>c.plant))].sort();
+  document.getElementById('plant-dist').innerHTML = plants.map(p => {
+    const cs = DATA.filter(c=>c.plant===p);
+    const done = cs.filter(c=>c.status==='Go-Live Stage').length;
+    const pct = cs.length ? Math.round(done/cs.length*100) : 0;
+    return `<div class="bar-row">
+      <div>${plantChip(p)} <span style="color:var(--text-3);font-size:11px">${PLANTS_FULL[p]||''}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:#039855"></div></div>
+      <div class="bar-count">${done}/${cs.length} live</div>
+    </div>`;
+  }).join('');
+  // Financial impact summary by plant (in-roadmap only): realized vs target
+  const finEl = document.getElementById('finance-dist');
+  if(finEl){
+    const inRoadmap = DATA.filter(c=>c.inRoadmap==='Yes');
+    const totalTarget = inRoadmap.reduce((s,c)=>s+(typeof c.financialImpact==='number'?c.financialImpact:0),0);
+    const totalRealized = inRoadmap.filter(c=>c.status==='Go-Live Stage').reduce((s,c)=>s+(typeof c.financialImpact==='number'?c.financialImpact:0),0);
+    finEl.innerHTML = plants.map(p => {
+      const cs = DATA.filter(c=>c.plant===p && c.inRoadmap==='Yes');
+      const target = cs.reduce((s,c)=>s+(typeof c.financialImpact==='number'?c.financialImpact:0),0);
+      const realized = cs.filter(c=>c.status==='Go-Live Stage').reduce((s,c)=>s+(typeof c.financialImpact==='number'?c.financialImpact:0),0);
+      const liveCount = cs.filter(c=>c.status==='Go-Live Stage').length;
+      const pct = target ? Math.round(realized/target*100) : 0;
+      return `<div class="bar-row">
+        <div>${plantChip(p)} <span style="color:var(--text-3);font-size:11px">${liveCount}/${cs.length} live</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:#059669"></div></div>
+        <div class="bar-count" style="font-weight:600"><span style="color:#059669">₹${realized}</span> <span style="color:var(--text-3);font-weight:500">/ ₹${target} Cr</span></div>
+      </div>`;
+    }).join('') + `<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);font-size:13px;color:var(--text-2)">
+      <b style="color:#059669">₹${totalRealized} Cr/yr realized</b> out of <b>₹${totalTarget} Cr/yr</b> total target across in-target-value-list cases.
+      <span style="color:var(--text-3)">(realized = sum from Go-Live Stage cases)</span>
+    </div>`;
+  }
+  // default range: last 30 days
+  if(!document.getElementById('r-from').value){
+    const to = new Date(); const from = new Date(); from.setDate(from.getDate()-30);
+    document.getElementById('r-from').value = from.toISOString().slice(0,10);
+    document.getElementById('r-to').value = to.toISOString().slice(0,10);
+  }
+  renderActivity();
+}
+function setQuickRange(days){
+  const to = new Date(); const from = new Date(); from.setDate(from.getDate()-days);
+  document.getElementById('r-from').value = from.toISOString().slice(0,10);
+  document.getElementById('r-to').value = to.toISOString().slice(0,10);
+  renderActivity();
+}
+function getActivityRows(){
+  const f = document.getElementById('r-from').value;
+  const t = document.getElementById('r-to').value;
+  if(!f || !t) return [];
+  const fromTs = new Date(f+'T00:00:00').getTime();
+  const toTs = new Date(t+'T23:59:59').getTime();
+  const rows = [];
+  DATA.forEach(c => {
+    c.history.forEach(h => {
+      const ts = new Date(h.at).getTime();
+      if(ts>=fromTs && ts<=toTs){
+        rows.push({...h, id:c.id, plant:c.plant, area:c.area, initiative:c.initiative, l2Initiative:c.l2Initiative||''});
+      }
+    });
+  });
+  rows.sort((a,b)=> b.at.localeCompare(a.at));
+  return rows;
+}
+function renderActivity(){
+  const rows = getActivityRows();
+  document.getElementById('activity-summary').textContent = `${rows.length} update${rows.length===1?'':'s'} in selected period`;
+  const wrap = document.getElementById('activity-log');
+  if(!rows.length){ wrap.innerHTML = '<div class="empty">No activity in this date range.</div>'; return; }
+  wrap.innerHTML = `<table class="activity-table">
+    <thead><tr><th>Date/Time</th><th>ID</th><th>Plant</th><th>Initiative</th><th>Change</th><th>Note</th></tr></thead>
+    <tbody>${rows.map(r=>`<tr>
+      <td style="white-space:nowrap">${fmtDateTime(r.at)}</td>
+      <td><span class="case-id">${r.id}</span></td>
+      <td>${plantChip(r.plant)}</td>
+      <td>${escapeHtml(r.initiative)}</td>
+      <td>${r.from && r.to && r.from!==r.to ? `${statusBadge(r.from)} → ${statusBadge(r.to)}` : statusBadge(r.to||r.from||'')}</td>
+      <td>${escapeHtml(r.note||'')}</td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+function csvEscape(v){ v = (v==null?'':String(v)); if(/[",\n]/.test(v)) return '"'+v.replace(/"/g,'""')+'"'; return v; }
+function downloadFile(name, content, type='text/csv;charset=utf-8'){
+  const blob = new Blob([content], {type});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 200);
+}
+function exportActivityCSV(){
+  const rows = getActivityRows();
+  if(!rows.length){ toast('No activity to export'); return; }
+  const head = ['Date/Time','ID','Plant','Area','Initiative','L2 Initiative','From Status','To Status','Note'];
+  const lines = [head.join(',')];
+  rows.forEach(r => lines.push([fmtDateTime(r.at), r.id, r.plant, r.area, r.initiative, r.l2Initiative||'', r.from||'', r.to||'', r.note||''].map(csvEscape).join(',')));
+  const f = document.getElementById('r-from').value, t = document.getElementById('r-to').value;
+  downloadFile(`activity_${f}_to_${t}.csv`, lines.join('\n'));
+  toast('Activity report exported');
+}
+function exportSnapshotCSV(){
+  const head = ['ID','Plant','Area','Initiative','L2 Initiative','In Target Value List','Financial Impact (Cr/yr)','Status','Owner','Hot Trials','Started Date','Target Date','Go-Live Date','Performance Start Date','Performance End Date','Last Update','Last Note','Use Case Description'];
+  const lines = [head.join(',')];
+  DATA.forEach(c => {
+    const last = c.history.length ? c.history[c.history.length-1] : null;
+    lines.push([c.id, c.plant, c.area, c.initiative, c.l2Initiative||'', c.inRoadmap||'',
+                typeof c.financialImpact==='number'?c.financialImpact:'',
+                c.status, c.owner, c.hotTrials||'',
+                c.startedDate||'', c.targetDate||'', c.goLiveDate||'', c.perfStartDate||'', c.perfEndDate||'',
+                last?fmtDateTime(last.at):'', last?last.note||'':'', c.description].map(csvEscape).join(','));
+  });
+  downloadFile(`use_cases_snapshot_${new Date().toISOString().slice(0,10)}.csv`, lines.join('\n'));
+  toast('Snapshot exported');
+}
+function exportData(){
+  downloadFile(`uc_tracker_backup_${new Date().toISOString().slice(0,10)}.json`, JSON.stringify(DATA, null, 2), 'application/json');
+  toast('Backup downloaded');
+}
+function publishHtml(){
+  // Bake the current DATA (all your updates) into a fresh copy of this HTML file
+  // so it can be re-uploaded to Tiiny.host (or any host) and reflect the live state
+  // for everyone who visits the URL — overcoming the per-browser localStorage limitation.
+  let html = document.documentElement.outerHTML;
+  // Replace the SEED array with current DATA (preserves all status updates, owners, dates, history)
+  const seedJson = JSON.stringify(DATA);
+  const replaced = html.replace(/const SEED = \[[\s\S]*?\];/, 'const SEED = ' + seedJson + ';');
+  if(replaced === html){
+    toast('Could not bake in data — try again');
+    return;
+  }
+  // Bump the storage key so visitors who had old localStorage from a previous version
+  // will pick up the freshly baked state on first visit instead of seeing stale data.
+  const stamp = 'pub_' + Date.now().toString(36);
+  const final = '<!DOCTYPE html>\n' + replaced.replace(/const STORAGE_KEY = "[^"]+";/, 'const STORAGE_KEY = "uc_tracker_' + stamp + '";');
+  const date = new Date().toISOString().slice(0,10);
+  downloadFile(`Plant_use_case_tracker_${date}.html`, final, 'text/html');
+  toast('HTML exported — re-upload this file to Tiiny.host to share your updates');
+}
+function importData(ev){
+  const file = ev.target.files[0]; if(!file) return;
+  const r = new FileReader();
+  r.onload = e => {
+    try{
+      const arr = JSON.parse(e.target.result);
+      if(!Array.isArray(arr)) throw new Error();
+      confirmModal('Restore from backup?', `This will replace your current data with ${arr.length} records from the backup. Continue?`, () => {
+        const migrated = migrate(arr);
+        DATA = arr; saveData(); render();
+        toast(migrated ? `Data restored (${migrated} record${migrated===1?'':'s'} migrated to current schema)` : 'Data restored');
+      });
+    }catch{ toast('Invalid backup file'); }
+    ev.target.value = '';
+  };
+  r.readAsText(file);
+}
+function resetData(){
+  confirmModal('Reset all data?', 'This will erase all status updates, owners, and history, and restore the original use cases. Cannot be undone.', () => {
+    DATA = JSON.parse(JSON.stringify(SEED));
+    saveData(); render(); toast('Data reset to original');
+  });
+}
+function confirmModal(title, body, onOk){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').textContent = body;
+  const ok = document.getElementById('modal-ok');
+  const newOk = ok.cloneNode(true);
+  ok.parentNode.replaceChild(newOk, ok);
+  newOk.addEventListener('click', () => { closeModal(); onOk(); });
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+document.getElementById('modal').addEventListener('click', e => { if(e.target.id==='modal') closeModal(); });
+
+loadData();
+// Mode detection:
+//  - file:// (opened locally on desktop)  → admin mode (full editing)
+//  - http(s)://… with ?admin=1            → admin mode
+//  - http(s)://… without ?admin=1         → view-only (for sharing the URL)
+const IS_LOCAL = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+const IS_ADMIN = IS_LOCAL || new URLSearchParams(location.search).get('admin') === '1';
+if(!IS_ADMIN) document.body.classList.add('view-only');
+render();
+if(memoryFallback){
+  const n = document.createElement('div');
+  n.className = 'notice';
+  n.innerHTML = '<b>⚠ Storage unavailable in preview.</b> &nbsp;Download this file and open it locally to save your updates between sessions.';
+  document.querySelector('main').prepend(n);
+}
+</script>
+
+</body></html>
